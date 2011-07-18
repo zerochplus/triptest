@@ -8,16 +8,16 @@
 #
 #	This program made by windyakin ◆windyaking ( http://windyakin.net/ )
 #
-#	Last up date 2010.08.13
+#	Last up date 2011.07.18
 #
 #------------------------------------------------------------------------------------------
 use strict;
 
-use CGI::Carp qw(fatalsToBrowser);
+#use CGI::Carp qw(fatalsToBrowser);
 use CGI;
 use Digest::SHA1 qw(sha1_base64);
 
-our $ver = '20100813';
+our $ver = '20110718';
 our $cginame = ( @_ = split( /[\\\/]/, $0 ) )[$#_];
 
 my $q = new CGI;
@@ -35,20 +35,20 @@ my $check2 = ( $namakey ? ' checked' : '' );
 
 
 print "Content-type: text/html; charset=Shift_JIS\n\n";
-print <<EOF;
+print <<EOT;
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="ja">
 <body>
 
 <pre>
-EOF
+EOT
 
 # トリップ表示処理
 foreach ( @data ) {
-	print trip( ( $namakey ? nama($_) : $_ ), $echokey ) . "\n" if ( $_ =~ /#./ );
+	print trip( ( $namakey ? nama($_) : $_ ), $echokey ) . "\n" if ( $_ =~ /#/ );
 }
 
-print <<EOF;
+print <<EOT;
 </pre>
 
 <form method="post" action="$cginame">
@@ -61,7 +61,7 @@ print <<EOF;
 
 </body>
 </html>
-EOF
+EOT
 
 
 #------------------------------------------------------------------------------------------
@@ -90,6 +90,8 @@ sub trip {
 				
 				$key2 = pack( 'H*', $1 );
 				$salt = substr( $2 . '..', 0, 2 );
+				$salt =~ s/[^\.-z]/\./go;
+				$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
 				
 				# 0x80問題再現
 				$key2 =~ s/\x80[\x00-\xff]*$//;
@@ -106,7 +108,7 @@ sub trip {
 		else {
 			
 			# SHA1(新仕様)トリップ
-			$trip = substr( sha1_base64($key), 0, 12);
+			$trip = substr( sha1_base64($key), 0, 12 );
 			$trip =~ tr/+/./;
 			
 		}
@@ -116,7 +118,8 @@ sub trip {
 		# 従来のトリップ生成方式
 		
 		$key2 = $key;
-		$salt = substr( $key2 . 'H.', 1, 2 );
+		$salt = (length $key > 1 ? substr( $key, 1 ) : '');
+		$salt = substr( $salt . 'H.', 0, 2 );
 		$salt =~ s/[^\.-z]/\./go;
 		$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
 		
@@ -160,11 +163,13 @@ sub nama {
 		# 多すぎれば削る
 		$key = substr( $key, 0, 8 );
 		
-		my $salt = substr( $key . 'H.', 1, 2 );
+		my $salt = (length $key > 1 ? substr( $key, 1 ) : '');
+		$salt = substr( $salt . 'H.', 0, 2 );
 		$salt =~ s/[^\.-z]/\./go;
 		$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
 		
 		$key =~ s/(.)/unpack( 'H2', $1 )/eg;
+		
 		# 足りなければ足す
 		$key .= '0' x ( 16 - length $key );
 		

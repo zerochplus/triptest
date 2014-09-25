@@ -27,8 +27,12 @@ sub main {
 	
 	# クエリ整理
 	my $text = $query->param('text'); # ※sjisバイト列のまま扱う
-	my $nama = ($query->param('nama') ? 1 : 0);
-	my $check2 = ($nama ? ' checked' : '');
+	my $sc = $query->param('sc');
+	my $check1 = ($sc ? ' checked' : '');
+	my $nama = $query->param('nama');
+	my $check2 = (!defined $text || $nama ? ' checked' : '');
+	my $leave = $query->param('leave');
+	my $check3 = (!defined $text || $leave ? ' checked' : '');
 	
 	binmode(STDOUT);
 	binmode(STDOUT, ':encoding(cp932)');
@@ -53,7 +57,7 @@ EOT
 			$line =~ s/\r?\n\z//;
 			
 			if ($line =~ /#([\x00-\xff]*)\z/) {
-				my ($trip, $key, $key2, $n) = trip($1);
+				my ($trip, $key, $key2, $n) = trip($1, $sc);
 				
 				$trip = sanitize($trip);
 				$key = sanitize($key) if (defined $key);
@@ -80,9 +84,24 @@ EOT
 	print <<EOT;
 <form method="post">
 <input type="submit" value="テスト">
+<label for="sc">.sc仕様</label>
+<input type="checkbox" name="sc" value="1"$check1>
 <label for="nama">生キー相互変換</label>
-<input type="checkbox" name="nama" value="1"$check2><br>
-<textarea name="text" rows="10" style="width:700px;"></textarea>
+<input type="checkbox" name="nama" value="1"$check2>
+<label for="leave">テキストを残す</label>
+<input type="checkbox" name="leave" value="1"$check3><br>
+EOT
+
+	print '<textarea name="text" rows="10" style="width:700px;">';
+	if ($leave) {
+		binmode(STDOUT);
+		print $text;
+		binmode(STDOUT);
+		binmode(STDOUT, ':encoding(cp932)');
+	}
+	print "</textarea>\n";
+	
+	print <<EOT;
 </form>
 
 </body>
@@ -111,8 +130,8 @@ sub sanitize {
 #
 #-------------------------------------------------------------------------------
 sub trip {
-	my ($key) = @_;
-	my $trip = undef;
+	my ($key, $sc) = @_;
+	my $trip = '???';
 	my $nama = undef;
 	my $n = undef;
 	
@@ -127,7 +146,9 @@ sub trip {
 		
 		# 0x80問題再現
 		my $key2 = $key;
-		$key2 =~ s/\x80[\x00-\xff]*$//;
+		if (!$sc) {
+			$key2 =~ s/\x80[\x00-\xff]*$//;
+		}
 		
 		# 10桁トリップ生成
 		$trip = substr(crypt($key2, $salt), -10);
@@ -153,7 +174,9 @@ sub trip {
 			
 			# 0x80問題再現
 			my $key2 = $key;
-			$key2 =~ s/\x80[\x00-\xff]*$//;
+			if (!$sc) {
+				$key2 =~ s/\x80[\x00-\xff]*$//;
+			}
 			
 			# 10桁トリップ生成
 			$trip = substr(crypt($key2, $salt), -10);
@@ -166,13 +189,17 @@ sub trip {
 		# 先頭が$なら15桁トリップ
 		} elsif ($key =~ /^\$/) {
 			
-			# 15桁トリップ生成
-			$trip = substr( sha1_base64($key), 3, 15 );
-			$trip =~ tr/\/+/!./;
-			
-			# 2バイト目が半角カタカナならカタカナトリップ
-			if ($key =~ /^\$[\xa1-\xdf]/) { # [｡-ﾟ]
-				$trip =~ tr/0-9A-Za-z.!/\xa1-\xdf!/;
+			if ($sc) {
+				# 15桁トリップ生成
+				$trip = substr( sha1_base64($key), 3, 15 );
+				$trip =~ tr/\/+/!./;
+				
+				# 2バイト目が半角カタカナならカタカナトリップ
+				if ($key =~ /^\$[\xa1-\xdf]/) { # [｡-ﾟ]
+					$trip =~ tr/0-9A-Za-z.!/\xa1-\xdf!/;
+				}
+			} else {
+				$trip = '???';
 			}
 			
 		# どれでもなければなら12桁トリップ
@@ -227,8 +254,12 @@ sub key2sjis {
 	
 	if ($salt2 eq $salt) {
 		if ($key =~ /^(?:[\x20-\x7e\xa1-\xdf]|[\x81-\x9f\xe0-\xfc][\x40-\x7e\x80-\xfc])+([\x81-\x9f\xe0-\xfc]?)$/) {
-			$key .= ($1 eq "\x87" ? "\x80" : "\xa0") if ($1 ne '');
-			return $key;
+			if ($1 eq '') {
+				return $key;
+			} elsif (length($key) == 8) {
+				$key .= ($1 eq "\x87" ? "\x80" : "\xa0");
+				return $key;
+			}
 		}
 	}
 	

@@ -1,182 +1,238 @@
 #!/usr/bin/perl
 
-#------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #
-#	‚¨‚»‚ç‚­‚Q‚¿‚á‚ñ‚Ë‚éd—l‚Éˆê”Ô‹ß‚¢ƒgƒŠƒbƒvƒeƒXƒ^[
+#	ãŠãã‚‰ãï¼’ã¡ã‚ƒã‚“ã­ã‚‹ä»•æ§˜ã«ä¸€ç•ªè¿‘ã„ãƒˆãƒªãƒƒãƒ—ãƒ†ã‚¹ã‚¿ãƒ¼
 #
-#	-------------------------------------------------------------------------------------
+#	----------------------------------------------------------------------------
 #
-#	This program made by windyakin Ÿwindyaking ( http://windyakin.net/ )
+#	This program made by windyakin â—†windyaking ( http://windyakin.net/ )
 #
-#	Last up date 2011.07.18
+#	Last up date 2014.09.25
 #
-#------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
+use utf8;
 use strict;
 
-#use CGI::Carp qw(fatalsToBrowser);
+use lib '.';
 use CGI;
-use Digest::SHA1 qw(sha1_base64);
+use Crypt::UnixCrypt qw(crypt);
+use Digest::SHA::PurePerl qw(sha1_base64);
 
-our $ver = '20110718';
-our $cginame = ( @_ = split( /[\\\/]/, $0 ) )[$#_];
+our $VERSION = '20140925';
 
-my $q = new CGI;
-
-# ƒNƒGƒŠ®—
-my $text = $q->param('text') || '';
-my @data = split( /\x0d?\x0a/, $text );
-# ƒL[•\¦ƒpƒ‰ƒ[ƒ^[ˆÛ
-my $echokey = $q->param('key') || '';
-my $check1 = ( $echokey ? ' checked' : '' );
-# ¶ƒL[•ÏŠ·ƒpƒ‰ƒ[ƒ^[ˆÛ
-my $namakey = $q->param('nama') || '';
-my $check2 = ( $namakey ? ' checked' : '' );
-
-
-
-print "Content-type: text/html; charset=Shift_JIS\n\n";
-print <<EOT;
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+sub main {
+	my $query = CGI->new();
+	
+	# ã‚¯ã‚¨ãƒªæ•´ç†
+	my $text = $query->param('text'); # â€»sjisãƒã‚¤ãƒˆåˆ—ã®ã¾ã¾æ‰±ã†
+	my $nama = ($query->param('nama') ? 1 : 0);
+	my $check2 = ($nama ? ' checked' : '');
+	
+	binmode(STDOUT);
+	binmode(STDOUT, ':encoding(cp932)');
+	
+	print "Content-type: text/html; charset=Shift_JIS\n\n";
+	print <<EOT;
+<!DOCTYPE html>
 <html lang="ja">
 <body>
 
-<pre>
 EOT
-
-# ƒgƒŠƒbƒv•\¦ˆ—
-foreach ( @data ) {
-	print trip( ( $namakey ? nama($_) : $_ ), $echokey ) . "\n" if ( $_ =~ /#/ );
-}
-
-print <<EOT;
-</pre>
-
-<form method="post" action="$cginame">
-<input type="submit" value="ƒeƒXƒg">
-ƒgƒŠƒbƒvƒL[‚ğ•\\¦<input type="checkbox" name="key" value="1"$check1>
-¶ƒL[‚É•ÏŠ·<input type="checkbox" name="nama" value="1"$check2><br>
-<textarea name="text" rows="10" style="width:700px;">
-</textarea>
+	
+	# ãƒˆãƒªãƒƒãƒ—å¤‰æ›/è¡¨ç¤ºå‡¦ç†
+	if (defined $text) {
+		print "<pre>\n";
+		
+		binmode(STDOUT);
+		
+		open(my $lines, '<', \$text);
+		while (<$lines>) {
+			my $line = $_;
+			$line =~ s/\r?\n\z//;
+			
+			if ($line =~ /#([\x00-\xff]*)\z/) {
+				my ($trip, $key, $key2, $n) = trip($1);
+				
+				$trip = sanitize($trip);
+				$key = sanitize($key) if (defined $key);
+				$key2 = sanitize($key2) if (defined $key2);
+				
+				print "\x81\x9f$trip : ";
+				if ($nama && defined ($n ? $key : $key2)) {
+					print "#$key2 #$key\n";
+				} elsif ($n) {
+					print "#$key2\n";
+				} else {
+					print "#$key\n";
+				}
+			}
+		}
+		close($lines);
+		
+		binmode(STDOUT);
+		binmode(STDOUT, ':encoding(cp932)');
+		
+		print "</pre><hr>\n\n";
+	}
+	
+	print <<EOT;
+<form method="post">
+<input type="submit" value="ãƒ†ã‚¹ãƒˆ">
+<label for="nama">ç”Ÿã‚­ãƒ¼ç›¸äº’å¤‰æ›</label>
+<input type="checkbox" name="nama" value="1"$check2><br>
+<textarea name="text" rows="10" style="width:700px;"></textarea>
 </form>
 
 </body>
 </html>
 EOT
+	
+	return 0;
+}
 
+#-------------------------------------------------------------------------------
+#
+#	æ–‡å­—åˆ—ç„¡æ¯’åŒ–
+#
+#-------------------------------------------------------------------------------
+sub sanitize {
+	my ($str) = @_;
+	$str =~ s/&/&amp;/g;
+	$str =~ s/</&lt;/g;
+	$str =~ s/>/&gt;/g;
+	return $str;
+}
 
-#------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #
-#	ƒgƒŠƒbƒv•ÏŠ·—pƒTƒuƒ‹[ƒ`ƒ“(Vd—l¥¶ƒL[•ÏŠ·‘Î‰)
+#	ãƒˆãƒªãƒƒãƒ—ç”Ÿæˆ â€»sjisãƒã‚¤ãƒˆåˆ—
 #
-#------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 sub trip {
+	my ($key) = @_;
+	my $trip = undef;
+	my $nama = undef;
+	my $n = undef;
 	
-	my $key = shift;
-	my $echokey = shift || 0;
-	
-	my ( $trip, $mark, $salt, $nama, $key2 );
-	
-	$key = substr( $key, index( $key, '#' ) + 1 );
-	
-	# ƒgƒŠƒbƒvƒL[‚Ì’·‚³‚ª12bytesˆÈã‚È‚çV•ÏŠ·—p‚ÉØ‚è‘Ö‚¦
-	if ( length $key >= 12 ) {
+	# ã‚­ãƒ¼é•·ãŒ12bytesæœªæº€ãªã‚‰10æ¡ãƒˆãƒªãƒƒãƒ—
+	if (length($key) < 12) {
 		
-		# æ“ª•¶š—ñ‚Ìæ“¾
-		$mark = substr( $key, 0, 1 );
+		# ã‚­ãƒ¼ã‹ã‚‰ã‚½ãƒ«ãƒˆã‚’æ±ºå®š
+		my $salt = (length($key) > 1 ? substr($key, 1) : '');
+		$salt = substr("${salt}H.", 0, 2);
+		$salt =~ s/[^\.-z]/\./go;
+		$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
 		
-		if ( $mark eq '#' || $mark eq '$' ) {
+		# 0x80å•é¡Œå†ç¾
+		my $key2 = $key;
+		$key2 =~ s/\x80[\x00-\xff]*$//;
 		
-			if ( $key =~ m|^#([0-9a-zA-Z]{16})([\./0-9A-Za-z]{0,2})$| ) {
-				
-				$key2 = pack( 'H*', $1 );
-				$salt = substr( $2 . '..', 0, 2 );
-				$salt =~ s/[^\.-z]/\./go;
-				$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
-				
-				# 0x80–â‘èÄŒ»
-				$key2 =~ s/\x80[\x00-\xff]*$//;
-				
-				$trip = substr( crypt( $key2, $salt ), -10 );
-			}
-			else {
-				
-				# «—ˆ‚ÌŠg’£—p
-				$trip = '???';
-				
-			}
-		}
-		else {
+		# 10æ¡ãƒˆãƒªãƒƒãƒ—ç”Ÿæˆ
+		$trip = substr(crypt($key2, $salt), -10);
+		
+		# ç”Ÿã‚­ãƒ¼ã«å¤‰æ›
+		$nama = key2nama($key);
+		
+	# ã‚­ãƒ¼é•·ãŒ12bytesä»¥ä¸Š
+	} else {
+		
+		# ç”Ÿã‚­ãƒ¼å½¢å¼ãªã‚‰10æ¡ãƒˆãƒªãƒƒãƒ—
+		if ($key =~ /^#([0-9a-zA-Z]{16})([\.\/0-9A-Za-z]{0,2})$/ ) {
 			
-			# SHA1(Vd—l)ƒgƒŠƒbƒv
-			$trip = substr( sha1_base64($key), 0, 12 );
+			$nama = $key;
+			
+			# ç”Ÿã‚­ãƒ¼ã‹ã‚‰ã‚­ãƒ¼ã‚’å¾©å…ƒ
+			$key = pack('H*', $1);
+			
+			# ç”Ÿã‚­ãƒ¼ã‚ã‚‹ã„ã¯ã‚­ãƒ¼ã‹ã‚‰ã‚½ãƒ«ãƒˆã‚’æ±ºå®š
+			my $salt = substr("$2..", 0, 2);
+			$salt =~ s/[^\.-z]/\./go;
+			$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
+			
+			# 0x80å•é¡Œå†ç¾
+			my $key2 = $key;
+			$key2 =~ s/\x80[\x00-\xff]*$//;
+			
+			# 10æ¡ãƒˆãƒªãƒƒãƒ—ç”Ÿæˆ
+			$trip = substr(crypt($key2, $salt), -10);
+			
+			# ã‚­ãƒ¼ã‚’æ­£å¸¸åŒ–(sjis)
+			$key = key2sjis($key, $salt);
+			
+			$n = 1;
+			
+		# å…ˆé ­ãŒ$ãªã‚‰15æ¡ãƒˆãƒªãƒƒãƒ—
+		} elsif ($key =~ /^\$/) {
+			
+			# 15æ¡ãƒˆãƒªãƒƒãƒ—ç”Ÿæˆ
+			$trip = substr( sha1_base64($key), 3, 15 );
+			$trip =~ tr/\/+/!./;
+			
+			# 2ãƒã‚¤ãƒˆç›®ãŒåŠè§’ã‚«ã‚¿ã‚«ãƒŠãªã‚‰ã‚«ã‚¿ã‚«ãƒŠãƒˆãƒªãƒƒãƒ—
+			if ($key =~ /^\$[\xa1-\xdf]/) { # [ï½¡-ï¾Ÿ]
+				$trip =~ tr/0-9A-Za-z.!/\xa1-\xdf!/;
+			}
+			
+		# ã©ã‚Œã§ã‚‚ãªã‘ã‚Œã°ãªã‚‰12æ¡ãƒˆãƒªãƒƒãƒ—
+		} else {
+			
+			# 12æ¡ãƒˆãƒªãƒƒãƒ—ç”Ÿæˆ
+			$trip = substr(sha1_base64($key), 0, 12);
 			$trip =~ tr/+/./;
 			
 		}
 	}
-	else {
-		
-		# ]—ˆ‚ÌƒgƒŠƒbƒv¶¬•û®
-		
-		$key2 = $key;
-		$salt = (length $key > 1 ? substr( $key, 1 ) : '');
-		$salt = substr( $salt . 'H.', 0, 2 );
-		$salt =~ s/[^\.-z]/\./go;
-		$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
-		
-		# 0x80–â‘èÄŒ»
-		$key2 =~ s/\x80[\x00-\xff]*$//;
-		
-		$trip = substr( crypt( $key2, $salt ), -10 );
-		
-	}
 	
-	if ( $echokey eq 1 ) {
-		
-		# XSS‘Îô‚Á‚Û‚¢‚à‚Ì‚ğ‚µ‚Ä‚İ‚éƒeƒXƒg
-		$key =~ s/&/&amp;/g;
-		$key =~ s/</&lt;/g;
-		$key =~ s/>/&gt;/g;
-		$key =~ s/"/&quot;/g; #" # ©ƒTƒNƒ‰ƒGƒfƒBƒ^‘Îô(^_^;)
-		
-		return "Ÿ$trip : #$key";
-		
-	}
-	else {
-		return "Ÿ$trip";
-	}
-	
+	return ($trip, $key, $nama, $n);
 }
 
-#------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #
-#	¶ƒL[•ÏŠ·—pƒTƒuƒ‹[ƒ`ƒ“
+#	10æ¡ã‚­ãƒ¼â†’ç”Ÿã‚­ãƒ¼å¤‰æ› â€»sjisãƒã‚¤ãƒˆåˆ—
 #
-#------------------------------------------------------------------------------------------
-sub nama {
+#-------------------------------------------------------------------------------
+sub key2nama {
+	my ($key) = @_;
 	
-	my $key = shift;
+	$key = substr($key, 0, 8);
 	
-	$key = substr( $key, index( $key, '#' ) + 1 );
+	my $salt = (length($key) > 1 ? substr($key, 1) : '');
+	$salt = substr("${salt}H.", 0, 2);
+	$salt =~ s/[^\.-z]/\./go;
+	$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
 	
-	if ( length $key <= 11 ){
-		
-		# ‘½‚·‚¬‚ê‚Îí‚é
-		$key = substr( $key, 0, 8 );
-		
-		my $salt = (length $key > 1 ? substr( $key, 1 ) : '');
-		$salt = substr( $salt . 'H.', 0, 2 );
-		$salt =~ s/[^\.-z]/\./go;
-		$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
-		
-		$key =~ s/(.)/unpack( 'H2', $1 )/eg;
-		
-		# ‘«‚è‚È‚¯‚ê‚Î‘«‚·
-		$key .= '0' x ( 16 - length $key );
-		
-		return "##$key$salt";
-	}
-	else {
-		return "#$key";
-	}
+	$key =~ s/([\x00-\xff])/unpack('H2', $1)/eg;
 	
+	$key .= '0' x (16 - length($key));
+	
+	return "#$key$salt";
 }
+
+#-------------------------------------------------------------------------------
+#
+#	10æ¡ã‚­ãƒ¼æ­£å¸¸åŒ– â€»sjisãƒã‚¤ãƒˆåˆ—
+#
+#-------------------------------------------------------------------------------
+sub key2sjis {
+	my ($key, $salt) = @_;
+	
+	$key =~ s/\x00+$//;
+	
+	my $salt2 = (length($key) > 1 ? substr($key, 1) : '');
+	$salt2 = substr("${salt2}H.", 0, 2);
+	$salt2 =~ s/[^\.-z]/\./go;
+	$salt2 =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
+	
+	if ($salt2 eq $salt) {
+		if ($key =~ /^(?:[\x20-\x7e\xa1-\xdf]|[\x81-\x9f\xe0-\xfc][\x40-\x7e\x80-\xfc])+([\x81-\x9f\xe0-\xfc]?)$/) {
+			$key .= ($1 eq "\x87" ? "\x80" : "\xa0") if ($1 ne '');
+			return $key;
+		}
+	}
+	
+	return undef;
+}
+
+exit(main());

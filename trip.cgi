@@ -27,6 +27,8 @@ my $ISUTF8 = ('◆' eq "\x{25C6}");
 sub main {
 	my $query = CGI->new();
 	
+	my @modes = qw(net sc open next strb vips 0chp);
+	
 	# クエリ整理
 	my $text = $query->param('text');
 	my $mode = $query->param('mode');
@@ -34,17 +36,17 @@ sub main {
 	my $kote = $query->param('kote');
 	my $leave = $query->param('leave');
 	$text = decode('utf8', $text) if (defined $text);
-	$mode = 'net' if (!defined $mode || ($mode ne 'net' && $mode ne 'sc' &&
-						$mode ne 'open' && $mode ne 'next' && $mode ne 'strb'));
+	$mode = 'net' if (!defined $mode);
+	$mode = 'net' if (!grep { $_ eq $mode } @modes);
 	
-	my $selectnet = ($mode eq 'net' ? ' selected' : '');
-	my $selectsc = ($mode eq 'sc' ? ' selected' : '');
-	my $selectopen = ($mode eq 'open' ? ' selected' : '');
-	my $selectnext = ($mode eq 'next' ? ' selected' : '');
-	my $selectstrb = ($mode eq 'strb' ? ' selected' : '');
-	my $checknama = ($nama ? ' checked' : '');
-	my $checkkote = ($kote ? ' checked' : '');
-	my $checkleave = (!defined $text || $leave ? ' checked' : '');
+	my %select = ();
+	foreach my $m (@modes) {
+		$select{$m} = ($mode eq $m ? ' selected' : '');
+	}
+	my %check = ();
+	$check{'nama'} = ($nama ? ' checked' : '');
+	$check{'kote'} = ($kote ? ' checked' : '');
+	$check{'leave'} = (!defined $text || $leave ? ' checked' : '');
 	
 	binmode(STDOUT);
 	binmode(STDOUT, ':utf8') if ($ISUTF8);
@@ -88,15 +90,17 @@ EOT
 <form method="post">
 <input type="submit" value="テスト">
 <select name="mode">
-<option value="net"$selectnet>2ch.net</option>
-<option value="sc"$selectsc>2ch.sc</option>
-<option value="open"$selectopen>open2ch.net</option>
-<option value="next"$selectnext>next2ch.net</option>
-<option value="strb"$selectstrb>したらば</option>
+<option value="net"$select{'net'}>2ch.net</option>
+<option value="sc"$select{'sc'}>2ch.sc</option>
+<option value="open"$select{'open'}>open2ch.net</option>
+<option value="next"$select{'next'}>next2ch.net</option>
+<option value="strb"$select{'strb'}>したらば</option>
+<option value="vips"$select{'vips'}>VIP Service</option>
+<option value="0chp"$select{'0chp'}>0ch+系</option>
 </select>
-<input type="checkbox" name="nama" id="nama" value="1"$checknama><label for="nama">生キー相互変換</label>
-<input type="checkbox" name="kote" id="kote" value="1"$checkkote><label for="kote">コテハンも表示</label>
-<input type="checkbox" name="leave" id="leave" value="1"$checkleave><label for="leave">テキストを残す</label>
+<input type="checkbox" name="nama" id="nama" value="1"$check{'nama'}><label for="nama">生キー相互変換</label>
+<input type="checkbox" name="kote" id="kote" value="1"$check{'kote'}><label for="kote">コテハンも表示</label>
+<input type="checkbox" name="leave" id="leave" value="1"$check{'leave'}><label for="leave">テキストを残す</label>
 <br>
 EOT
 
@@ -143,7 +147,7 @@ sub trip {
 	my $_key = $key;
 	
 	# 事前置換処理
-	if ($mode eq 'net' || $mode eq 'strb') {
+	if ($mode eq 'net') {
 		$_key =~ s/＃/#/g;
 	}
 	if ($mode eq 'open') {
@@ -167,11 +171,21 @@ sub trip {
 		$_key =~ s/</&lt;/g;
 		$_key =~ s/>/&gt;/g;
 		$_key =~ s/"/&quot;/g;
-		$_key =~ tr/◆/◇/;
+		$_key =~ s/◆/◇/g;
+		$_key =~ s/＃/#/g;
+	}
+	if ($mode eq 'vips') {
+		$_key =~ s/</&lt;/g;
+		$_key =~ s/>/&gt;/g;
+		$_key =~ s/"/&quot;/g;
+		$_key =~ s/'/&#39;/g;
+	}
+	if ($mode eq '0chp') {
+		$_key =~ s/＃/#/;
 	}
 	
 	# 文字コード関連
-	if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'strb') {
+	if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'strb' || $mode eq 'vips' || $mode eq '0chp') {
 		$_key = encode('cp932', $_key);
 	}
 	if ($mode eq 'open') {
@@ -199,7 +213,7 @@ sub trip {
 		# キーからソルトを決定
 		my $salt = (length($_key) > 1 ? substr($_key, 1) : '');
 		$salt = substr("${salt}H.", 0, 2);
-		if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'open' || $mode eq 'strb') {
+		if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'open' || $mode eq 'strb' || $mode eq 'vips' || $mode eq '0chp') {
 			$salt =~ s/[^\x2e-\x7a]/\./go;
 			$salt =~ tr/\x3a-\x40\x5b-\x60/A-Ga-f/;
 		}
@@ -214,7 +228,7 @@ sub trip {
 		}
 		
 		# 0x80問題再現
-		if ($mode eq 'net') {
+		if ($mode eq 'net' || $mode eq '0chp') {
 			$_key =~ s/\x80[\x00-\xff]*$//;
 		}
 		
@@ -242,7 +256,7 @@ sub trip {
 		$key1 = decode('cp932', $key1) if (defined $key1);
 		
 		# 0x80問題再現
-		if ($mode eq 'net') {
+		if ($mode eq 'net' || $mode eq '0chp') {
 			$_key =~ s/\x80[\x00-\xff]*$//;
 		}
 		

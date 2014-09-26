@@ -17,7 +17,7 @@ use strict;
 
 use lib '.';
 use CGI;
-use Crypt::UnixCrypt qw(crypt);
+use Crypt::UnixCrypt;
 use Digest::SHA::PurePerl qw(sha1_base64);
 
 our $VERSION = '20140925';
@@ -30,9 +30,11 @@ sub main {
 	my $sc = $query->param('sc');
 	my $check1 = ($sc ? ' checked' : '');
 	my $nama = $query->param('nama');
-	my $check2 = (!defined $text || $nama ? ' checked' : '');
+	my $check2 = ($nama ? ' checked' : '');
 	my $leave = $query->param('leave');
 	my $check3 = (!defined $text || $leave ? ' checked' : '');
+	my $kote = $query->param('kote');
+	my $check4 = ($kote ? ' checked' : '');
 	
 	binmode(STDOUT);
 	binmode(STDOUT, ':encoding(cp932)');
@@ -57,17 +59,16 @@ EOT
 			$line =~ s/\r?\n\z//;
 			
 			if ($line =~ /#([\x00-\xff]*)\z/) {
-				my ($trip, $key, $key2, $n) = trip($1, $sc);
+				my ($trip, $key1, $key2, $key, $type) = trip($1, $sc);
 				
 				$trip = sanitize($trip);
-				$key = sanitize($key) if (defined $key);
+				$key = sanitize($key1) if (defined $key1);
 				$key2 = sanitize($key2) if (defined $key2);
 				
+				print sanitize($`).' ' if ($kote);
 				print "\x81\x9f$trip : ";
-				if ($nama && defined ($n ? $key : $key2)) {
-					print "#$key2 #$key\n";
-				} elsif ($n) {
-					print "#$key2\n";
+				if ($nama && ($type eq '10trip' || $type eq '10nama')) {
+					print "#$key2 #$key1\n";
 				} else {
 					print "#$key\n";
 				}
@@ -84,12 +85,11 @@ EOT
 	print <<EOT;
 <form method="post">
 <input type="submit" value="テスト">
-<label for="sc">.sc仕様</label>
-<input type="checkbox" name="sc" value="1"$check1>
-<label for="nama">生キー相互変換</label>
-<input type="checkbox" name="nama" value="1"$check2>
-<label for="leave">テキストを残す</label>
-<input type="checkbox" name="leave" value="1"$check3><br>
+<input type="checkbox" name="sc" id="sc" value="1"$check1><label for="sc">.sc仕様</label>
+<input type="checkbox" name="nama" id="nama" value="1"$check2><label for="nama">生キー相互変換</label>
+<input type="checkbox" name="kote" id="kote" value="1"$check4><label for="kote">コテハンも表示</label>
+<input type="checkbox" name="leave" id="leave" value="1"$check3><label for="leave">テキストを残す</label>
+<br>
 EOT
 
 	print '<textarea name="text" rows="10" style="width:700px;">';
@@ -131,93 +131,111 @@ sub sanitize {
 #-------------------------------------------------------------------------------
 sub trip {
 	my ($key, $sc) = @_;
+	
 	my $trip = '???';
-	my $nama = undef;
-	my $n = undef;
+	my $key1 = undef;
+	my $key2 = undef;
+	my $type = 'unknown';
+	
+	my $_key = $key;
+	if ($sc) {
+		$_key =~ s/\x81\x94/ #/;
+	} else {
+		while ($_key =~ s/^((?:[\x20-\x7e\xa1-\xdf]|[\x81-\x9f\xe0-\xfc][\x40-\x7e\x80-\xfc])*?)\x81\x94/$1#/) { }
+	}
 	
 	# キー長が12bytes未満なら10桁トリップ
-	if (length($key) < 12) {
+	if (length($_key) < 12) {
+		
+		$type = '10trip';
+		
+		$key1 = $key;
+		
+		# 生キーに変換
+		$key2 = key2nama($_key);
 		
 		# キーからソルトを決定
-		my $salt = (length($key) > 1 ? substr($key, 1) : '');
+		my $salt = (length($_key) > 1 ? substr($_key, 1) : '');
 		$salt = substr("${salt}H.", 0, 2);
 		$salt =~ s/[^\.-z]/\./go;
 		$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
 		
 		# 0x80問題再現
-		my $key2 = $key;
 		if (!$sc) {
-			$key2 =~ s/\x80[\x00-\xff]*$//;
+			$_key =~ s/\x80[\x00-\xff]*$//;
 		}
 		
 		# 10桁トリップ生成
-		$trip = substr(crypt($key2, $salt), -10);
+		$trip = substr(crypt($_key, $salt), -10);
 		
-		# 生キーに変換
-		$nama = key2nama($key);
+	# キー長が12bytes以上で生キー形式なら10桁トリップ
+	} elsif ($_key =~ /^#([0-9a-zA-Z]{16})([\.\/0-9A-Za-z]{0,2})$/ ) {
 		
-	# キー長が12bytes以上
+		$type = '10nama';
+		
+		# 生キーあるいはキーからソルトを決定
+		my $salt = substr("$2..", 0, 2);
+		$salt =~ s/[^\.-z]/\./go;
+		$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
+		
+		$key2 = "#$1$salt";
+		
+		# 生キーからキーを復元
+		$_key = pack('H*', $1);
+		
+		# キーを正常化(sjis)
+		$key1 = key2sjis($_key, $salt);
+		
+		# 0x80問題再現
+		if (!$sc) {
+			$_key =~ s/\x80[\x00-\xff]*$//;
+		}
+		
+		# 10桁トリップ生成
+		$trip = substr(crypt($_key, $salt), -10);
+		
+	# キー長が12bytes以上で先頭が$なら15桁トリップ
+	} elsif ($_key =~ /^\$/) {
+		
+		$key1 = $key;
+		
+		if ($sc) {
+			$type = '15trip';
+			
+			# 15桁トリップ生成
+			$trip = substr(sha1_base64($_key), 3, 15);
+			$trip =~ tr/\/+/!./;
+			
+			# 2バイト目が半角カタカナならカタカナトリップ
+			if ($_key =~ /^\$[\xa1-\xdf]/) { # [｡-ﾟ]
+				$type = '15kana';
+				$trip =~ tr/0-9A-Za-z.!/\xa1-\xdf!/;
+			}
+		} else {
+			$trip = '???';
+		}
+		
+	# キー長が12bytes以上で先頭が#なら未定義
+	} elsif ($key =~ /^#/) {
+		
+		$key1 = $key;
+		
+		$trip = '???';
+		
+	# キー長が12bytes以上でどれでもなければなら12桁トリップ
 	} else {
 		
-		# 生キー形式なら10桁トリップ
-		if ($key =~ /^#([0-9a-zA-Z]{16})([\.\/0-9A-Za-z]{0,2})$/ ) {
-			
-			$nama = $key;
-			
-			# 生キーからキーを復元
-			$key = pack('H*', $1);
-			
-			# 生キーあるいはキーからソルトを決定
-			my $salt = substr("$2..", 0, 2);
-			$salt =~ s/[^\.-z]/\./go;
-			$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
-			
-			# 0x80問題再現
-			my $key2 = $key;
-			if (!$sc) {
-				$key2 =~ s/\x80[\x00-\xff]*$//;
-			}
-			
-			# 10桁トリップ生成
-			$trip = substr(crypt($key2, $salt), -10);
-			
-			# キーを正常化(sjis)
-			$key = key2sjis($key, $salt);
-			
-			$n = 1;
-			
-		# 先頭が$なら15桁トリップ
-		} elsif ($key =~ /^\$/) {
-			
-			if ($sc) {
-				# 15桁トリップ生成
-				$trip = substr( sha1_base64($key), 3, 15 );
-				$trip =~ tr/\/+/!./;
-				
-				# 2バイト目が半角カタカナならカタカナトリップ
-				if ($key =~ /^\$[\xa1-\xdf]/) { # [｡-ﾟ]
-					$trip =~ tr/0-9A-Za-z.!/\xa1-\xdf!/;
-				}
-			} else {
-				$trip = '???';
-			}
-			
-		# 先頭が#なら未定義
-		} elsif ($key =~ /^#/) {
-			
-			$trip = '???';
-			
-		# どれでもなければなら12桁トリップ
-		} else {
-			
-			# 12桁トリップ生成
-			$trip = substr(sha1_base64($key), 0, 12);
-			$trip =~ tr/+/./;
-			
-		}
+		$type = '12trip';
+		
+		$key1 = $key;
+		
+		# 12桁トリップ生成
+		$trip = substr(sha1_base64($_key), 0, 12);
+		$trip =~ tr/+/./;
+		
 	}
 	
-	return ($trip, $key, $nama, $n);
+	return ($trip, $key1, $key2, $key, $type);
 }
 
 #-------------------------------------------------------------------------------
@@ -271,4 +289,5 @@ sub key2sjis {
 	return undef;
 }
 
-exit(main());
+exit(main()) if (!defined caller);
+1;

@@ -8,7 +8,7 @@
 #
 #	This program made by windyakin ◆windyaking ( http://windyakin.net/ )
 #
-#	Last up date 2014.09.25
+#	Last up date 2014.09.26
 #
 #-------------------------------------------------------------------------------
 
@@ -20,7 +20,8 @@ use CGI;
 use Crypt::UnixCrypt;
 use Digest::SHA::PurePerl qw(sha1_base64);
 
-our $VERSION = '20140925';
+our $VERSION = '20140926';
+my $ISUTF8 = ('◆' eq "\x{25C6}");
 
 sub main {
 	my $query = CGI->new();
@@ -37,7 +38,7 @@ sub main {
 	my $check4 = ($kote ? ' checked' : '');
 	
 	binmode(STDOUT);
-	binmode(STDOUT, ':encoding(cp932)');
+	binmode(STDOUT, ':encoding(cp932)') if ($ISUTF8);
 	
 	print "Content-type: text/html; charset=Shift_JIS\n\n";
 	print <<EOT;
@@ -77,7 +78,7 @@ EOT
 		close($lines);
 		
 		binmode(STDOUT);
-		binmode(STDOUT, ':encoding(cp932)');
+		binmode(STDOUT, ':encoding(cp932)') if ($ISUTF8);
 		
 		print "</pre><hr>\n\n";
 	}
@@ -97,7 +98,7 @@ EOT
 		binmode(STDOUT);
 		print $text;
 		binmode(STDOUT);
-		binmode(STDOUT, ':encoding(cp932)');
+		binmode(STDOUT, ':encoding(cp932)') if ($ISUTF8);
 	}
 	print "</textarea>\n";
 	

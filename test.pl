@@ -1,10 +1,6 @@
 use utf8;
 use strict;
 
-use lib '.';
-use Crypt::UnixCrypt;
-use Digest::SHA::PurePerl qw(sha1_base64);
-
 sub main {
 	require 'trip.cgi';
 	# #1

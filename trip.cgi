@@ -16,6 +16,7 @@ use utf8;
 use strict;
 
 use lib '.';
+use Encode;
 use CGI;
 use Crypt::UnixCrypt;
 use Digest::SHA::PurePerl qw(sha1_base64);
@@ -27,20 +28,26 @@ sub main {
 	my $query = CGI->new();
 	
 	# クエリ整理
-	my $text = $query->param('text'); # ※sjisバイト列のまま扱う
-	my $sc = $query->param('sc');
-	my $check1 = ($sc ? ' checked' : '');
+	my $text = $query->param('text');
+	my $mode = $query->param('mode');
 	my $nama = $query->param('nama');
-	my $check2 = ($nama ? ' checked' : '');
-	my $leave = $query->param('leave');
-	my $check3 = (!defined $text || $leave ? ' checked' : '');
 	my $kote = $query->param('kote');
-	my $check4 = ($kote ? ' checked' : '');
+	my $leave = $query->param('leave');
+	$text = decode('utf8', $text) if (defined $text);
+	$mode = 'net' if (!defined $mode || ($mode ne 'net' && $mode ne 'sc' && $mode ne 'open' && $mode ne 'next'));
+	
+	my $selectnet = ($mode eq 'net' ? ' selected' : '');
+	my $selectsc = ($mode eq 'sc' ? ' selected' : '');
+	my $selectopen = ($mode eq 'open' ? ' selected' : '');
+	my $selectnext = ($mode eq 'next' ? ' selected' : '');
+	my $checknama = ($nama ? ' checked' : '');
+	my $checkkote = ($kote ? ' checked' : '');
+	my $checkleave = (!defined $text || $leave ? ' checked' : '');
 	
 	binmode(STDOUT);
-	binmode(STDOUT, ':encoding(cp932)') if ($ISUTF8);
+	binmode(STDOUT, ':utf8') if ($ISUTF8);
 	
-	print "Content-type: text/html; charset=Shift_JIS\n\n";
+	print "Content-type: text/html; charset=UTF-8\n\n";
 	print <<EOT;
 <!DOCTYPE html>
 <html lang="ja">
@@ -52,22 +59,18 @@ EOT
 	if (defined $text) {
 		print "<pre>\n";
 		
-		binmode(STDOUT);
-		
-		open(my $lines, '<', \$text);
-		while (<$lines>) {
-			my $line = $_;
-			$line =~ s/\r?\n\z//;
-			
-			if ($line =~ /#([\x00-\xff]*)\z/) {
-				my ($trip, $key1, $key2, $key, $type) = trip($1, $sc);
+		my @lines = split(/\r?\n/, $text);
+		foreach my $line (@lines) {
+			if ($line =~ /#([\s\S]*)\z/) {
+				my ($trip, $key1, $key2, $key, $type) = trip($1, $mode);
 				
 				$trip = sanitize($trip);
-				$key = sanitize($key1) if (defined $key1);
+				$key = sanitize($key);
+				$key1 = sanitize($key1) if (defined $key1);
 				$key2 = sanitize($key2) if (defined $key2);
 				
 				print sanitize($`).' ' if ($kote);
-				print "\x81\x9f$trip : ";
+				print "◆$trip : ";
 				if ($nama && ($type eq '10trip' || $type eq '10nama')) {
 					print "#$key2 #$key1\n";
 				} else {
@@ -75,10 +78,6 @@ EOT
 				}
 			}
 		}
-		close($lines);
-		
-		binmode(STDOUT);
-		binmode(STDOUT, ':encoding(cp932)') if ($ISUTF8);
 		
 		print "</pre><hr>\n\n";
 	}
@@ -86,20 +85,20 @@ EOT
 	print <<EOT;
 <form method="post">
 <input type="submit" value="テスト">
-<input type="checkbox" name="sc" id="sc" value="1"$check1><label for="sc">.sc仕様</label>
-<input type="checkbox" name="nama" id="nama" value="1"$check2><label for="nama">生キー相互変換</label>
-<input type="checkbox" name="kote" id="kote" value="1"$check4><label for="kote">コテハンも表示</label>
-<input type="checkbox" name="leave" id="leave" value="1"$check3><label for="leave">テキストを残す</label>
+<select name="mode">
+<option value="net"$selectnet>2ch.net</option>
+<option value="sc"$selectsc>2ch.sc</option>
+<option value="open"$selectopen>open2ch.net</option>
+<option value="next"$selectnext>next2ch.net</option>
+</select>
+<input type="checkbox" name="nama" id="nama" value="1"$checknama><label for="nama">生キー相互変換</label>
+<input type="checkbox" name="kote" id="kote" value="1"$checkkote><label for="kote">コテハンも表示</label>
+<input type="checkbox" name="leave" id="leave" value="1"$checkleave><label for="leave">テキストを残す</label>
 <br>
 EOT
 
 	print '<textarea name="text" rows="10" style="width:700px;">';
-	if ($leave) {
-		binmode(STDOUT);
-		print $text;
-		binmode(STDOUT);
-		binmode(STDOUT, ':encoding(cp932)') if ($ISUTF8);
-	}
+	print sanitize($text) if ($leave);
 	print "</textarea>\n";
 	
 	print <<EOT;
@@ -127,11 +126,11 @@ sub sanitize {
 
 #-------------------------------------------------------------------------------
 #
-#	トリップ生成 ※sjisバイト列
+#	トリップ生成 ※キーは内部コード(utf8)
 #
 #-------------------------------------------------------------------------------
 sub trip {
-	my ($key, $sc) = @_;
+	my ($key, $mode) = @_;
 	
 	my $trip = '???';
 	my $key1 = undef;
@@ -139,14 +138,46 @@ sub trip {
 	my $type = 'unknown';
 	
 	my $_key = $key;
-	if ($sc) {
+	
+	# 事前置換処理
+	if ($mode eq 'net') {
+		$_key =~ s/＃/#/g;
+	}
+	if ($mode eq 'open') {
+		$_key =~ s/\t//g;
+		$_key =~ s/</&lt;/g;
+		$_key =~ s/>/&gt;/g;
+		$_key =~ s/"/&quot;/g;
+		$_key =~ s/'/&#39;/g;
+		$_key =~ tr/■▲▼★●◆/□△▽☆○◇/;
+	}
+	if ($mode eq 'next') {
+		$_key =~ s/&/&amp;/g;
+		$_key =~ s/</&lt;/g;
+		$_key =~ s/>/&gt;/g;
+		$_key =~ s/"/&quot;/g;
+		$_key =~ s/'/&#039;/g;
+		$_key =~ tr/★◆/☆◇/;
+	}
+	
+	# 文字コード関連
+	if ($mode eq 'net' || $mode eq 'sc') {
+		$_key = encode('cp932', $_key);
+	}
+	if ($mode eq 'open') {
+		$_key = encode('sjis', $_key);
+	}
+	if ($mode eq 'next') {
+		$_key = encode('utf8', $_key);
+	}
+	
+	# 事前置換処理
+	if ($mode eq 'sc') {
 		$_key =~ s/\x81\x94/ #/;
-	} else {
-		while ($_key =~ s/^((?:[\x20-\x7e\xa1-\xdf]|[\x81-\x9f\xe0-\xfc][\x40-\x7e\x80-\xfc])*?)\x81\x94/$1#/) { }
 	}
 	
 	# キー長が12bytes未満なら10桁トリップ
-	if (length($_key) < 12) {
+	if (length($_key) < 12 || $mode eq 'next') {
 		
 		$type = '10trip';
 		
@@ -158,11 +189,22 @@ sub trip {
 		# キーからソルトを決定
 		my $salt = (length($_key) > 1 ? substr($_key, 1) : '');
 		$salt = substr("${salt}H.", 0, 2);
-		$salt =~ s/[^\.-z]/\./go;
-		$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
+		if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'open') {
+			$salt =~ s/[^\x2e-\x7a]/\./go;
+			$salt =~ tr/\x3a-\x40\x5b-\x60/A-Ga-f/;
+		}
+		if ($mode eq 'next') {
+			$salt =~ s/[^\x21-\x7a]/\./go;
+			$salt =~ tr/\x21-\x2d\x3a-\x40\x5b-\x60/n-zA-Ga-f/;
+		}
+		if (0) {
+			# 無変換と同等
+			#$salt =~ tr/\x00-\x2d\x3a-\x40\x5b-\x60\x7b-\x7f/G-Za-z3-9U-Z\.\/0-2/;
+			#$salt =~ tr/\x80-\xb9\xba-\xff/G-Za-z\.\/0-9A-Za-z\.\/0-9A-F/;
+		}
 		
 		# 0x80問題再現
-		if (!$sc) {
+		if ($mode eq 'net') {
 			$_key =~ s/\x80[\x00-\xff]*$//;
 		}
 		
@@ -174,10 +216,10 @@ sub trip {
 		
 		$type = '10nama';
 		
-		# 生キーあるいはキーからソルトを決定
+		# 生キーからソルトを決定
 		my $salt = substr("$2..", 0, 2);
-		$salt =~ s/[^\.-z]/\./go;
-		$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
+		$salt =~ s/[^\x2e-\x7a]/\./go;
+		$salt =~ tr/\x3a-\x40\x5b-\x60/A-Ga-f/;
 		
 		$key2 = "#$1$salt";
 		
@@ -186,21 +228,24 @@ sub trip {
 		
 		# キーを正常化(sjis)
 		$key1 = key2sjis($_key, $salt);
+		# 文字コード関連
+		$key1 = decode('cp932', $key1) if (defined $key1);
 		
 		# 0x80問題再現
-		if (!$sc) {
+		if ($mode eq 'net') {
 			$_key =~ s/\x80[\x00-\xff]*$//;
 		}
 		
 		# 10桁トリップ生成
 		$trip = substr(crypt($_key, $salt), -10);
 		
-	# キー長が12bytes以上で先頭が$なら15桁トリップ
+	# キー長が12bytes以上で先頭が$なら独自拡張/未定義
 	} elsif ($_key =~ /^\$/) {
 		
 		$key1 = $key;
 		
-		if ($sc) {
+		# scなら15桁トリップ
+		if ($mode eq 'sc') {
 			$type = '15trip';
 			
 			# 15桁トリップ生成
@@ -211,7 +256,9 @@ sub trip {
 			if ($_key =~ /^\$[\xa1-\xdf]/) { # [｡-ﾟ]
 				$type = '15kana';
 				$trip =~ tr/0-9A-Za-z.!/\xa1-\xdf!/;
+				$trip = decode('cp932', $trip) if (defined $key1);
 			}
+			
 		} else {
 			$trip = '???';
 		}
@@ -241,7 +288,7 @@ sub trip {
 
 #-------------------------------------------------------------------------------
 #
-#	10桁キー→生キー変換 ※sjisバイト列
+#	10桁キー→生キー変換 ※キーはバイト列
 #
 #-------------------------------------------------------------------------------
 sub key2nama {
@@ -263,7 +310,7 @@ sub key2nama {
 
 #-------------------------------------------------------------------------------
 #
-#	10桁キー正常化 ※sjisバイト列
+#	10桁キー正常化 ※キーはsjisバイト列
 #
 #-------------------------------------------------------------------------------
 sub key2sjis {

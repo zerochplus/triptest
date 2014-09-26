@@ -10,8 +10,10 @@ sub main {
 		'tsGpSwX8mo',
 		'tsGpSwX8mo',
 		'tsGpSwX8mo',
+		'tsGpSwX8mo',
 	);
 	test('12345678',
+		'WBRXcNtpf.',
 		'WBRXcNtpf.',
 		'WBRXcNtpf.',
 		'WBRXcNtpf.',
@@ -22,23 +24,27 @@ sub main {
 		'WBRXcNtpf.',
 		'WBRXcNtpf.',
 		'XrlOBrDwyU',
+		'WBRXcNtpf.',
 	);
 	test('ｱｲｳｴｵｶｷｸ',
 		'XlUiP8mHCU',
 		'XlUiP8mHCU',
 		'XlUiP8mHCU',
 		'xmvISdVBK2',
+		'XlUiP8mHCU',
 	);
 	test('ｋａｍｉ',
 		'yGAhoNiShI',
 		'yGAhoNiShI',
 		'yGAhoNiShI',
 		'eRrBb7O29A',
+		'yGAhoNiShI',
 	);
 	test('#828b8281828d8289',
 		'yGAhoNiShI',
 		'yGAhoNiShI',
 		'yGAhoNiShI',
+		'NXUZ00CMW6',
 		'NXUZ00CMW6',
 	);
 	test('#828b8281828d8289.',
@@ -46,11 +52,13 @@ sub main {
 		'yGAhoNiShI',
 		'yGAhoNiShI',
 		'NXUZ00CMW6',
+		'NXUZ00CMW6',
 	);
 	test('#828b8281828d8289..',
 		'yGAhoNiShI',
 		'yGAhoNiShI',
 		'yGAhoNiShI',
+		'NXUZ00CMW6',
 		'NXUZ00CMW6',
 	);
 	test('騨ﾚNWKJ諤',
@@ -58,11 +66,13 @@ sub main {
 		'YYYYYYYYYY',
 		'YYYYYYYYYY',
 		'lOOFR1xhP.',
+		'YYYYYYYYYY',
 	);
 	test('#3132333435363738',
 		'XlUiP8mHCU',
 		'XlUiP8mHCU',
 		'XlUiP8mHCU',
+		'ULUFJt9VDM',
 		'ULUFJt9VDM',
 	);
 	test('#31323334353637382',
@@ -70,11 +80,13 @@ sub main {
 		'1tWQFkUcLU',
 		'1tWQFkUcLU',
 		'ULUFJt9VDM',
+		'ULUFJt9VDM',
 	);
 	test('#313233343536373823',
 		'WBRXcNtpf.',
 		'WBRXcNtpf.',
 		'WBRXcNtpf.',
+		'ULUFJt9VDM',
 		'ULUFJt9VDM',
 	);
 	test('#3100000000000000H.',
@@ -82,8 +94,10 @@ sub main {
 		'tsGpSwX8mo',
 		'tsGpSwX8mo',
 		'6O5ptllf5k',
+		'6O5ptllf5k',
 	);
 	test('123456789',
+		'WBRXcNtpf.',
 		'WBRXcNtpf.',
 		'WBRXcNtpf.',
 		'WBRXcNtpf.',
@@ -94,8 +108,10 @@ sub main {
 		'WBRXcNtpf.',
 		'WBRXcNtpf.',
 		'WBRXcNtpf.',
+		'WBRXcNtpf.',
 	);
 	test('12345678901',
+		'WBRXcNtpf.',
 		'WBRXcNtpf.',
 		'WBRXcNtpf.',
 		'WBRXcNtpf.',
@@ -106,11 +122,13 @@ sub main {
 		'jZk8zfYo4m4X',
 		'jZk8zfYo4m4X',
 		'WBRXcNtpf.',
+		'WBRXcNtpf.',
 	);
 	test('1234567890123',
 		'CNfebL9sP6Ci',
 		'CNfebL9sP6Ci',
 		'CNfebL9sP6Ci',
+		'WBRXcNtpf.',
 		'WBRXcNtpf.',
 	);
 	test('あいうえおか',
@@ -118,8 +136,10 @@ sub main {
 		'N0mUb9Yq8DyS',
 		'N0mUb9Yq8DyS',
 		'hhorpR4oiM',
+		'AU/OjWxByc',
 	);
 	test('$2345678901',
+		'BaNAE36vrg',
 		'BaNAE36vrg',
 		'BaNAE36vrg',
 		'BaNAE36vrg',
@@ -130,11 +150,13 @@ sub main {
 		'4QKLUa.0a8HzwPe',
 		'???',
 		'BaNAE36vrg',
+		'BaNAE36vrg',
 	);
 	test('$..........2',
 		'???',
 		'RqK!0i.t49rNji7',
 		'???',
+		'bwOnxXJup.',
 		'bwOnxXJup.',
 	);
 	test('$｡3456789012',
@@ -142,23 +164,27 @@ sub main {
 		'ｾﾍｵﾏﾝｷｩｳﾚﾔ･ｴﾋ･ｴ',
 		'???',
 		'3A/Hqpzc9c',
+		'RhQIlLvzs6',
 	);
 	test('$｡1008343131',
 		'???',
 		'ﾃｽﾄ!ｹﾏﾜｬｴ･ｧﾎﾖｲﾎ',
 		'???',
 		'hkjDnZZGPM',
+		'lEjCdVtEDo',
 	);
 	test('$ｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵ',
 		'???',
 		'ｳﾟｾﾉｪ｣ﾈﾊﾍｬﾏﾟｦｳｹ',
 		'???',
 		'OS8Cx1YIIk',
+		'Nxf9REt3eA',
 	);
 	test('#23456789012',
 		'???',
 		'???',
 		'???',
+		'y3.ScW8dbE',
 		'y3.ScW8dbE',
 	);
 	test('#1234567890123456..abc',
@@ -166,17 +192,20 @@ sub main {
 		'???',
 		'???',
 		'Oi/x1UMuw.',
+		'Oi/x1UMuw.',
 	);
 	test('ホムホム',
 		'QD4TDVpNOM',
 		'L809q.Wvdk',
 		'L809q.Wvdk',
 		'C93qWoB2hg',
+		'L809q.Wvdk',
 	);
 	test('#837a8380837a8380z.',
 		'QD4TDVpNOM',
 		'L809q.Wvdk',
 		'L809q.Wvdk',
+		'RzVraEhVVs',
 		'RzVraEhVVs',
 	);
 	test('◆●★',
@@ -184,28 +213,40 @@ sub main {
 		'dTHrbNrOw.',
 		'RNM4OlZz7s',
 		'yNZt80OfCs',
+		'YZQgr.7WNI',
 	);
 	test('■▲▼',
 		'GExJOqup6A',
 		'GExJOqup6A',
 		'MOZcYuJkdU',
 		'qkC5YKQWyg',
+		'GExJOqup6A',
 	);
 	test('◆★',
 		'9hhQmDPmK2',
 		'9hhQmDPmK2',
 		'DVlEzgbdkE',
 		'pF26cWkf/Q',
+		'wJ5itNiesE',
 	);
 	test('<>"&',
 		'f0abm3NbDw',
 		'f0abm3NbDw',
 		'7gGRCKani97t',
 		'Gw/f5wZwNg',
+		'Gw/f5wZwNg',
+	);
+	test('<>',
+		'3wNccY4njg',
+		'3wNccY4njg',
+		'Gw/f5wZwNg',
+		'Gw/f5wZwNg',
+		'Gw/f5wZwNg',
 	);
 	test('"',
 		'4eqVTkonjE',
 		'4eqVTkonjE',
+		'gt1azVccY2',
 		'gt1azVccY2',
 		'gt1azVccY2',
 	);
@@ -214,14 +255,17 @@ sub main {
 		'8/08awL.AE',
 		'HA0pkXpKB6',
 		'UtX4XpdDog',
+		'8/08awL.AE',
 	);
 	test("&",
 		'2r2Ga7GHRc',
 		'2r2Ga7GHRc',
 		'2r2Ga7GHRc',
 		'MhCJJ7GVT.',
+		'2r2Ga7GHRc',
 	);
 	test('1234567&',
+		'q3.yfaIC5s',
 		'q3.yfaIC5s',
 		'q3.yfaIC5s',
 		'q3.yfaIC5s',
@@ -232,35 +276,41 @@ sub main {
 		'4qJVtuc8yc',
 		'DWQ0QMJveuYp',
 		'q3.yfaIC5s',
+		'q3.yfaIC5s',
 	);
 	test('＃',
 		'u2YjtUz8MU',
 		'68NHrw0u9M',
 		'e57oZ1fb1o',
 		'By6DvOdjOA',
+		'u2YjtUz8MU',
 	);
 	test(' ＃',
 		'68NHrw0u9M',
 		'g3.NWF1Chs',
 		'PlnfWZhzek',
 		'.Agbc1OR8c',
+		'68NHrw0u9M',
 	);
 	test('＃＃',
 		'xSK1SiC5MI',
 		'wOlE71ViKc',
 		'dn4m8J5vno',
 		'8SjNjRYO8U',
+		'xSK1SiC5MI',
 	);
 	test('＝煤＃',
 		'0ZaZ6Ph9YM',
 		'8Ifcd5IMRw',
 		'pnkCIOJmhY',
 		'u/UThijc9k',
+		'0ZaZ6Ph9YM',
 	);
 	test('123456789012＃',
 		'RITzbxS2I3J9',
 		'aKqOHnvuUtkd',
 		'.sf3a0vVPg6Q',
+		'WBRXcNtpf.',
 		'WBRXcNtpf.',
 	);
 	test('1234567890＃',
@@ -268,26 +318,31 @@ sub main {
 		'.oWZrnJVutMW',
 		'VIJJSV7/Fqfl',
 		'WBRXcNtpf.',
+		'WBRXcNtpf.',
 	);
 	test('＃3456789012',
 		'lg6Q/4u.i.',
 		'VlTC9VCYT7DD',
 		'fbYpKBXnp7Oj',
 		'p2nGyNlkqo',
+		'lg6Q/4u.i.',
 	);
 	test('＃31318194313100001.',
 		'7ZE59iVq1I',
 		'j6J/iuF0lYOO',
 		'f9AYGqFM9G6T',
 		'wHuJ.Rjqa2',
+		'JFUJu00dRM',
 	);
 	test('＝噤＝氈',
 		'Pcn5KeK8IQ',
 		'Pcn5KeK8IQ',
 		'Pcn5KeK8IQ',
 		'cZaFShsneI',
+		'Pcn5KeK8IQ',
 	);
 	test('fusianasan',
+		'M2TLe2H2No',
 		'M2TLe2H2No',
 		'M2TLe2H2No',
 		'M2TLe2H2No',
@@ -298,32 +353,38 @@ sub main {
 		'Az6yZqa0I2',
 		'Vyfxi/dpqw',
 		'e3LOKfsWv2',
+		'Az6yZqa0I2',
 	);
 	test('～',
 		'Fg7tQabTMc',
 		'Fg7tQabTMc',
 		'cPUZU5OGFs',
 		'2nUHWotKCQ',
+		'Fg7tQabTMc',
 	);
 	test('一一',
 		'b3B4i2sLpY',
 		'b3B4i2sLpY',
 		'b3B4i2sLpY',
 		'VAhc1fHCZ2',
+		'b3B4i2sLpY',
 	);
 	test('0 !',
 		'ZIJx7G/pyg',
 		'ZIJx7G/pyg',
 		'ZIJx7G/pyg',
 		'JB1xkjXQ86',
+		'ZIJx7G/pyg',
 	);
 	test('0-:',
 		'NE0mkZ2TpI',
 		'NE0mkZ2TpI',
 		'NE0mkZ2TpI',
 		'tHGdgYtE5Y',
+		'NE0mkZ2TpI',
 	);
 	test('0@[',
+		'gkmryCvLz6',
 		'gkmryCvLz6',
 		'gkmryCvLz6',
 		'gkmryCvLz6',
@@ -334,8 +395,10 @@ sub main {
 		'WtDsB59Wrk',
 		'WtDsB59Wrk',
 		'WtDsB59Wrk',
+		'WtDsB59Wrk',
 	);
 	test('0|}',
+		'M6kra150Vk',
 		'M6kra150Vk',
 		'M6kra150Vk',
 		'M6kra150Vk',
@@ -346,22 +409,25 @@ sub main {
 		'sXoB65CSvY',
 		'/lQMO72QVo',
 		'sXoB65CSvY',
+		'OeKveLL.YQ',
 	);
 }
 
 sub test {
-	my ($key, $tripnet, $tripsc, $tripopen, $tripnext) = @_;
+	my ($key, $tripnet, $tripsc, $tripopen, $tripnext, $tripstrb) = @_;
 	my ($tripnet_, undef, undef, undef, undef) = trip($key, 'net');
 	my ($tripsc_, undef, undef, undef, undef) = trip($key, 'sc');
 	my ($tripopen_, undef, undef, undef, undef) = trip($key, 'open');
 	my ($tripnext_, undef, undef, undef, undef) = trip($key, 'next');
-	if ($tripnet_ eq $tripnet && $tripsc_ eq $tripsc && $tripopen_ eq $tripopen && $tripnext_ eq $tripnext) {
+	my ($tripstrb_, undef, undef, undef, undef) = trip($key, 'strb');
+	if ($tripnet_ eq $tripnet && $tripsc_ eq $tripsc && 
+		$tripopen_ eq $tripopen && $tripnext_ eq $tripnext && $tripstrb_ eq $tripstrb) {
 		#print "key #$key\n";
 		#print "  ...ok\n";
 	} else {
 		print "key #$key\n";
-		print "  result net:$tripnet_ sc:$tripsc_ open:$tripopen_ next:$tripnext_\n";
-		print "  expect net:$tripnet sc:$tripsc open:$tripopen next:$tripnext\n";
+		print "  result net:$tripnet_ sc:$tripsc_ open:$tripopen_ next:$tripnext_ strb:$tripstrb_\n";
+		print "  expect net:$tripnet sc:$tripsc open:$tripopen next:$tripnext strb:$tripstrb\n";
 	}
 }
 

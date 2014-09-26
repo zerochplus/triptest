@@ -34,12 +34,14 @@ sub main {
 	my $kote = $query->param('kote');
 	my $leave = $query->param('leave');
 	$text = decode('utf8', $text) if (defined $text);
-	$mode = 'net' if (!defined $mode || ($mode ne 'net' && $mode ne 'sc' && $mode ne 'open' && $mode ne 'next'));
+	$mode = 'net' if (!defined $mode || ($mode ne 'net' && $mode ne 'sc' &&
+						$mode ne 'open' && $mode ne 'next' && $mode ne 'strb'));
 	
 	my $selectnet = ($mode eq 'net' ? ' selected' : '');
 	my $selectsc = ($mode eq 'sc' ? ' selected' : '');
 	my $selectopen = ($mode eq 'open' ? ' selected' : '');
 	my $selectnext = ($mode eq 'next' ? ' selected' : '');
+	my $selectstrb = ($mode eq 'strb' ? ' selected' : '');
 	my $checknama = ($nama ? ' checked' : '');
 	my $checkkote = ($kote ? ' checked' : '');
 	my $checkleave = (!defined $text || $leave ? ' checked' : '');
@@ -90,6 +92,7 @@ EOT
 <option value="sc"$selectsc>2ch.sc</option>
 <option value="open"$selectopen>open2ch.net</option>
 <option value="next"$selectnext>next2ch.net</option>
+<option value="strb"$selectstrb>したらば</option>
 </select>
 <input type="checkbox" name="nama" id="nama" value="1"$checknama><label for="nama">生キー相互変換</label>
 <input type="checkbox" name="kote" id="kote" value="1"$checkkote><label for="kote">コテハンも表示</label>
@@ -140,7 +143,7 @@ sub trip {
 	my $_key = $key;
 	
 	# 事前置換処理
-	if ($mode eq 'net') {
+	if ($mode eq 'net' || $mode eq 'strb') {
 		$_key =~ s/＃/#/g;
 	}
 	if ($mode eq 'open') {
@@ -159,9 +162,16 @@ sub trip {
 		$_key =~ s/'/&#039;/g;
 		$_key =~ tr/★◆/☆◇/;
 	}
+	if ($mode eq 'strb') {
+		$_key =~ s/\t/ /g;
+		$_key =~ s/</&lt;/g;
+		$_key =~ s/>/&gt;/g;
+		$_key =~ s/"/&quot;/g;
+		$_key =~ tr/◆/◇/;
+	}
 	
 	# 文字コード関連
-	if ($mode eq 'net' || $mode eq 'sc') {
+	if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'strb') {
 		$_key = encode('cp932', $_key);
 	}
 	if ($mode eq 'open') {
@@ -177,7 +187,7 @@ sub trip {
 	}
 	
 	# キー長が12bytes未満なら10桁トリップ
-	if (length($_key) < 12 || $mode eq 'next') {
+	if (length($_key) < 12 || $mode eq 'next' || $mode eq 'strb') {
 		
 		$type = '10trip';
 		
@@ -189,7 +199,7 @@ sub trip {
 		# キーからソルトを決定
 		my $salt = (length($_key) > 1 ? substr($_key, 1) : '');
 		$salt = substr("${salt}H.", 0, 2);
-		if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'open') {
+		if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'open' || $mode eq 'strb') {
 			$salt =~ s/[^\x2e-\x7a]/\./go;
 			$salt =~ tr/\x3a-\x40\x5b-\x60/A-Ga-f/;
 		}

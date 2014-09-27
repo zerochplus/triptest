@@ -22,12 +22,11 @@ use Crypt::UnixCrypt;
 use Digest::SHA::PurePerl qw(sha1_base64);
 
 our $VERSION = '20140926';
-my $ISUTF8 = ('◆' eq "\x{25C6}");
+my @modes = qw(net sc open next strb vips 0chp bban machi);
 
 sub main {
 	my $query = CGI->new();
 	
-	my @modes = qw(net sc open next strb vips 0chp);
 	
 	# クエリ整理
 	my $text = $query->param('text');
@@ -49,7 +48,7 @@ sub main {
 	$check{'leave'} = (!defined $text || $leave ? ' checked' : '');
 	
 	binmode(STDOUT);
-	binmode(STDOUT, ':utf8') if ($ISUTF8);
+	binmode(STDOUT, ':utf8');
 	
 	print "Content-type: text/html; charset=UTF-8\n\n";
 	print <<EOT;
@@ -97,6 +96,8 @@ EOT
 <option value="strb"$select{'strb'}>したらば</option>
 <option value="vips"$select{'vips'}>VIP Service</option>
 <option value="0chp"$select{'0chp'}>0ch+系</option>
+<option value="bban"$select{'bban'}>blogban</option>
+<option value="machi"$select{'machi'}>まちBBS</option>
 </select>
 <input type="checkbox" name="nama" id="nama" value="1"$check{'nama'}><label for="nama">生キー相互変換</label>
 <input type="checkbox" name="kote" id="kote" value="1"$check{'kote'}><label for="kote">コテハンも表示</label>
@@ -128,6 +129,8 @@ sub sanitize {
 	$str =~ s/&/&amp;/g;
 	$str =~ s/</&lt;/g;
 	$str =~ s/>/&gt;/g;
+	$str =~ s/"/&quot;/g;
+	$str =~ s/'/&#39;/g;
 	return $str;
 }
 
@@ -139,6 +142,8 @@ sub sanitize {
 sub trip {
 	my ($key, $mode) = @_;
 	
+	die if (!grep { $_ eq $mode } @modes);
+	
 	my $trip = '???';
 	my $key1 = undef;
 	my $key2 = undef;
@@ -149,59 +154,63 @@ sub trip {
 	# 事前置換処理
 	if ($mode eq 'net') {
 		$_key =~ s/＃/#/g;
-	}
-	if ($mode eq 'open') {
+	} elsif ($mode eq 'open') {
 		$_key =~ s/\t//g;
 		$_key =~ s/</&lt;/g;
 		$_key =~ s/>/&gt;/g;
 		$_key =~ s/"/&quot;/g;
 		$_key =~ s/'/&#39;/g;
 		$_key =~ tr/■▲▼★●◆/□△▽☆○◇/;
-	}
-	if ($mode eq 'next') {
+	} elsif ($mode eq 'next') {
 		$_key =~ s/&/&amp;/g;
 		$_key =~ s/</&lt;/g;
 		$_key =~ s/>/&gt;/g;
 		$_key =~ s/"/&quot;/g;
 		$_key =~ s/'/&#039;/g;
 		$_key =~ tr/★◆/☆◇/;
-	}
-	if ($mode eq 'strb') {
+	} elsif ($mode eq 'strb') {
 		$_key =~ s/\t/ /g;
 		$_key =~ s/</&lt;/g;
 		$_key =~ s/>/&gt;/g;
 		$_key =~ s/"/&quot;/g;
 		$_key =~ s/◆/◇/g;
 		$_key =~ s/＃/#/g;
-	}
-	if ($mode eq 'vips') {
+	} elsif ($mode eq 'vips') {
 		$_key =~ s/</&lt;/g;
 		$_key =~ s/>/&gt;/g;
 		$_key =~ s/"/&quot;/g;
 		$_key =~ s/'/&#39;/g;
-	}
-	if ($mode eq '0chp') {
+	} elsif ($mode eq '0chp') {
 		$_key =~ s/＃/#/;
+	} elsif ($mode eq 'machi') {
+		$_key =~ s/&/&amp/g;
+		$_key =~ s/</&lt;/g;
+		$_key =~ s/>/&gt;/g;
+		$_key =~ s/"/&quot;/g;
 	}
 	
 	# 文字コード関連
-	if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'strb' || $mode eq 'vips' || $mode eq '0chp') {
+	if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'strb' || 
+	    $mode eq 'vips' || $mode eq '0chp' || $mode eq 'bban' ||
+	    $mode eq 'machi') {
 		$_key = encode('cp932', $_key);
-	}
-	if ($mode eq 'open') {
+	} elsif ($mode eq 'open') {
 		$_key = encode('sjis', $_key);
-	}
-	if ($mode eq 'next') {
+	} elsif ($mode eq 'next') {
 		$_key = encode('utf8', $_key);
 	}
 	
 	# 事前置換処理
 	if ($mode eq 'sc') {
 		$_key =~ s/\x81\x94/ #/;
+	} elsif ($mode eq 'machi') {
+		$_key =~ s/\x81\x9f/\x81\x9e/g;
+		$_key =~ s/\x81\x94/#/g;
 	}
 	
 	# キー長が12bytes未満なら10桁トリップ
-	if (length($_key) < 12 || $mode eq 'next' || $mode eq 'strb') {
+	if (length($_key) < 12 ||
+	    $mode eq 'next' || $mode eq 'strb' || $mode eq 'machi') {
 		
 		$type = '10trip';
 		
@@ -213,18 +222,18 @@ sub trip {
 		# キーからソルトを決定
 		my $salt = (length($_key) > 1 ? substr($_key, 1) : '');
 		$salt = substr("${salt}H.", 0, 2);
-		if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'open' || $mode eq 'strb' || $mode eq 'vips' || $mode eq '0chp') {
+		if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'open' || 
+		    $mode eq 'strb' || $mode eq 'vips' || $mode eq '0chp' ||
+		    $mode eq 'bban' || $mode eq 'machi') {
 			$salt =~ s/[^\x2e-\x7a]/\./go;
 			$salt =~ tr/\x3a-\x40\x5b-\x60/A-Ga-f/;
-		}
-		if ($mode eq 'next') {
+		} elsif ($mode eq 'next') {
 			$salt =~ s/[^\x21-\x7a]/\./go;
 			$salt =~ tr/\x21-\x2d\x3a-\x40\x5b-\x60/n-zA-Ga-f/;
-		}
-		if (0) {
-			# 無変換と同等
-			#$salt =~ tr/\x00-\x2d\x3a-\x40\x5b-\x60\x7b-\x7f/G-Za-z3-9U-Z\.\/0-2/;
-			#$salt =~ tr/\x80-\xb9\xba-\xff/G-Za-z\.\/0-9A-Za-z\.\/0-9A-F/;
+		} else {
+			# 無変換と同等(実装依存？)
+			$salt =~ tr/\x00-\x2d\x3a-\x40\x5b-\x60\x7b-\x7f/G-Za-z3-9U-Z\.\/0-2/;
+			$salt =~ tr/\x80-\xb9\xba-\xff/G-Za-z\.\/0-9A-Za-z\.\/0-9A-F/;
 		}
 		
 		# 0x80問題再現

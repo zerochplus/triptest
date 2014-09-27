@@ -264,10 +264,13 @@ sub trip {
 		}
 		
 		# 生キーに変換
-		$key2 = substr($_key, 0, 8);
-		$key2 =~ s/([\x00-\xff])/unpack('H2', $1)/eg;
-		$key2 .= '0' x (16 - length($key2));
-		$key2 = "#$key2$salt";
+		if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'open' || 
+		    $mode eq 'vips' || $mode eq '0chp' || $mode eq 'bban') {
+			$key2 = substr($_key, 0, 8);
+			$key2 =~ s/([\x00-\xff])/unpack('H2', $1)/eg;
+			$key2 .= '0' x (16 - length($key2));
+			$key2 = "#$key2$salt";
+		}
 		
 		# 0x80問題再現
 		if ($mode eq 'net' || $mode eq '0chp') {
@@ -350,28 +353,6 @@ sub trip {
 	}
 	
 	return ($trip, $key1, $key2, $key, $type);
-}
-
-#-------------------------------------------------------------------------------
-#
-#	10桁キー→生キー変換 ※キーはバイト列
-#
-#-------------------------------------------------------------------------------
-sub key2nama {
-	my ($key) = @_;
-	
-	$key = substr($key, 0, 8);
-	
-	my $salt = (length($key) > 1 ? substr($key, 1) : '');
-	$salt = substr("${salt}H.", 0, 2);
-	$salt =~ s/[^\.-z]/\./go;
-	$salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
-	
-	$key =~ s/([\x00-\xff])/unpack('H2', $1)/eg;
-	
-	$key .= '0' x (16 - length($key));
-	
-	return "#$key$salt";
 }
 
 #-------------------------------------------------------------------------------

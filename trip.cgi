@@ -73,9 +73,19 @@ EOT
 				$key2 = sanitize($key2) if (defined $key2);
 				
 				print sanitize($`).' ' if ($kote);
-				print "◆$trip : ";
+				if (!defined $trip || $type eq 'notrip') {
+					print '[no trip] : ';
+				} else {
+					print "◆$trip : ";
+				}
 				if ($nama && ($type eq '10trip' || $type eq '10nama')) {
-					print "#$key2 #$key1\n";
+					if (!defined $key2) {
+						print "#$key1\n";
+					} elsif (!defined $key1) {
+						print "#$key2\n";
+					} else {
+						print "#$key2 #$key1\n";
+					}
 				} else {
 					print "#$key\n";
 				}
@@ -99,9 +109,9 @@ EOT
 <option value="bban"$select{'bban'}>blogban</option>
 <option value="machi"$select{'machi'}>まちBBS</option>
 </select>
-<input type="checkbox" name="nama" id="nama" value="1"$check{'nama'}><label for="nama">生キー相互変換</label>
 <input type="checkbox" name="kote" id="kote" value="1"$check{'kote'}><label for="kote">コテハンも表示</label>
 <input type="checkbox" name="leave" id="leave" value="1"$check{'leave'}><label for="leave">テキストを残す</label>
+<input type="checkbox" name="nama" id="nama" value="1"$check{'nama'}><label for="nama">生キー相互変換</label>
 <br>
 EOT
 
@@ -144,7 +154,7 @@ sub trip {
 	
 	die if (!grep { $_ eq $mode } @modes);
 	
-	my $trip = '???';
+	my $trip = undef;
 	my $key1 = undef;
 	my $key2 = undef;
 	my $type = 'unknown';
@@ -181,9 +191,9 @@ sub trip {
 		$_key =~ s/"/&quot;/g;
 		$_key =~ s/'/&#39;/g;
 	} elsif ($mode eq '0chp') {
-		$_key =~ s/＃/#/;
+		$_key =~ s/＃/#/;		# 1回のみ
 	} elsif ($mode eq 'machi') {
-		$_key =~ s/&/&amp/g;
+		$_key =~ s/&/&amp/g;	# セミコロンなし
 		$_key =~ s/</&lt;/g;
 		$_key =~ s/>/&gt;/g;
 		$_key =~ s/"/&quot;/g;
@@ -198,43 +208,66 @@ sub trip {
 		$_key = encode('sjis', $_key);
 	} elsif ($mode eq 'next') {
 		$_key = encode('utf8', $_key);
+	} else {
+		$_key = encode('cp932', $_key);
 	}
 	
 	# 事前置換処理
 	if ($mode eq 'sc') {
-		$_key =~ s/\x81\x94/ #/;
+		$_key =~ s/\x81\x94/ #/;		# s/＃/ #/ 1回のみ
 	} elsif ($mode eq 'machi') {
-		$_key =~ s/\x81\x9f/\x81\x9e/g;
-		$_key =~ s/\x81\x94/#/g;
+		$_key =~ s/\x81\x9f/\x81\x9e/g;	# s/◆/◇/g
+		$_key =~ s/\x81\x94/#/g;		# s/＃/#/g
 	}
 	
-	# キー長が12bytes未満なら10桁トリップ
-	if (length($_key) < 12 ||
+	# 空キー不可
+	if (length($_key) == 0 && ($mode eq 'sc' || $mode eq 'strb' || $mode eq 'machi')) {
+		
+		$type = 'notrip';
+		$key1 = $key;
+		$trip = undef;
+		
+	# 10桁only掲示板 または キー長が12bytes未満なら10桁トリップ
+	} elsif (length($_key) < 12 ||
 	    $mode eq 'next' || $mode eq 'strb' || $mode eq 'machi') {
 		
 		$type = '10trip';
 		
 		$key1 = $key;
 		
-		# 生キーに変換
-		$key2 = key2nama($_key);
-		
 		# キーからソルトを決定
-		my $salt = (length($_key) > 1 ? substr($_key, 1) : '');
-		$salt = substr("${salt}H.", 0, 2);
+		my $salt = '..';
+		if ($mode eq 'net' || $mode eq 'vips' || $mode eq '0chp') {
+			$salt = (length($_key) > 1 ? substr($_key, 1) : '');
+			$salt = substr("${salt}H.", 0, 2);
+		} elsif ($mode eq 'open' || $mode eq 'bban') {
+			$salt = substr("${_key}H.G", 1, 2);
+		} elsif ($mode eq 'next') {
+			$salt = substr("${_key}H.q", 1, 2);
+		} elsif ($mode eq 'sc' || $mode eq 'strb' || $mode eq 'machi') {
+			# 空キー不可のため未確認(影響なし)
+			$salt = substr("${_key}H.G", 1, 2);
+		}
 		if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'open' || 
 		    $mode eq 'strb' || $mode eq 'vips' || $mode eq '0chp' ||
 		    $mode eq 'bban' || $mode eq 'machi') {
 			$salt =~ s/[^\x2e-\x7a]/\./go;
 			$salt =~ tr/\x3a-\x40\x5b-\x60/A-Ga-f/;
 		} elsif ($mode eq 'next') {
+			# [\x21-\x2d]の置換なし
 			$salt =~ s/[^\x21-\x7a]/\./go;
 			$salt =~ tr/\x21-\x2d\x3a-\x40\x5b-\x60/n-zA-Ga-f/;
 		} else {
-			# 無変換と同等(実装依存？)
+			# 参考: 無変換と同等(実装依存？)
 			$salt =~ tr/\x00-\x2d\x3a-\x40\x5b-\x60\x7b-\x7f/G-Za-z3-9U-Z\.\/0-2/;
 			$salt =~ tr/\x80-\xb9\xba-\xff/G-Za-z\.\/0-9A-Za-z\.\/0-9A-F/;
 		}
+		
+		# 生キーに変換
+		$key2 = substr($_key, 0, 8);
+		$key2 =~ s/([\x00-\xff])/unpack('H2', $1)/eg;
+		$key2 .= '0' x (16 - length($key2));
+		$key2 = "#$key2$salt";
 		
 		# 0x80問題再現
 		if ($mode eq 'net' || $mode eq '0chp') {
@@ -303,7 +336,7 @@ sub trip {
 		
 		$trip = '???';
 		
-	# キー長が12bytes以上でどれでもなければなら12桁トリップ
+	# キー長が12bytes以上でどれでもなければ12桁トリップ
 	} else {
 		
 		$type = '12trip';

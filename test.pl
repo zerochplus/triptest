@@ -5,6 +5,17 @@ sub main {
 	require 'trip.cgi';
 	binmode(STDOUT);
 	binmode(STDOUT, ':encoding(cp932)');
+	test('',
+		'jPpg5.obl6',	# net
+		undef,			# sc / 消失
+		'fnkquv7jY2',	# open
+		'sgO7UmMnWw',	# next
+		undef,			# strb / #
+		'jPpg5.obl6',	# vips
+		'jPpg5.obl6',	# 0chp
+		'fnkquv7jY2',	# bban
+		undef,			# machi / #
+	);
 	test('1',
 		'tsGpSwX8mo',	# net
 		'tsGpSwX8mo',	# sc
@@ -652,11 +663,27 @@ sub test {
 	for my $i (0 .. $#modes) {
 		my ($result, undef, undef, undef, undef) = trip($key, $modes[$i]);
 		$results[$i] = $result;
-		if ($results[$i] ne $expects[$i]) {
-		print "key #$key\n";
-		print "  mode $modes[$i]\n";
-		print "  result $results[$i]\n";
-		print "  expect $expects[$i]\n";
+		my $diff = 0;
+		if (defined $results[$i] && defined $expects[$i]) {
+			if ($results[$i] ne $expects[$i]) {
+				$diff = 1;
+			}
+		} elsif (defined $results[$i] || defined $expects[$i]) {
+				$diff = 1;
+		}
+		if ($diff) {
+			print "key #$key\n";
+			print "  mode $modes[$i]\n";
+			if (defined $results[$i]) {
+				print "  result $results[$i]\n";
+			} else {
+				print "  result [no trip]\n";
+			}
+			if (defined $expects[$i]) {
+				print "  expect $expects[$i]\n";
+			} else {
+				print "  expect [no trip]\n";
+			}
 		}
 	}
 }

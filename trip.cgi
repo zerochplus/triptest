@@ -166,6 +166,12 @@ sub trip {
 	my $_key = $key;
 	
 	# 事前置換処理
+	if ($mode eq 'next' || $mode eq 'bban' || $mode eq 'ebbs' ||
+	    $mode eq 'atchs') {
+		$_key =~ s/\s+$//;
+	} elsif ($mode eq 'strb' || $mode eq 'machi') {
+		$_key =~ s/ +$//;
+	}
 	if ($mode eq 'net') {
 		$_key =~ s/＃/#/g;
 	} elsif ($mode eq 'open') {
@@ -238,9 +244,12 @@ sub trip {
 	} elsif ($mode eq 'next') {
 		$_key = encode('utf8', $_key);
 	} elsif ($mode eq 'atchs') {
-		my $u = encode('utf8', $_key);
-		if ($u =~ /^(?:[\x20-\x7e]|[\xa1-\xa8\xad\xb0-\xf4\xf9-\xfc][\xa1-\xfe])+$/) {
-			$_key = encode('sjis', decode('eucjp', $u));
+		my $valid = 1;
+		my $str = encode('utf8', $_key);
+		$str = decode('eucjp', $str, sub { $valid = 0; '' });
+		$str = encode('sjis', $str, sub { $valid = 0; '' });
+		if ($valid) {
+			$_key = $str;
 		} else {
 			$_key =~ s/\x{ff5e}/\x{301c}/g;	# 波ダッシュ
 			$_key =~ s/\x{ff0d}/\x{2212}/g;	# 全角ダッシュ

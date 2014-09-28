@@ -22,7 +22,7 @@ use Crypt::UnixCrypt;
 use Digest::SHA::PurePerl qw(sha1_base64);
 
 our $VERSION = '20140926';
-my @modes = qw(net sc open next strb vips 0chp bban machi);
+my @modes = qw(net sc open next strb vips 0chp bban machi patio 4chan ebbs);
 
 sub main {
 	my $query = CGI->new();
@@ -105,9 +105,12 @@ EOT
 <option value="next"$select{'next'}>next2ch.net</option>
 <option value="strb"$select{'strb'}>したらば</option>
 <option value="vips"$select{'vips'}>VIP Service</option>
-<option value="0chp"$select{'0chp'}>0ch+系</option>
 <option value="bban"$select{'bban'}>blogban</option>
 <option value="machi"$select{'machi'}>まちBBS</option>
+<option value="4chan"$select{'4chan'}>4chan</option>
+<option value="ebbs"$select{'ebbs'}>ebbs.jp</option>
+<option value="0chp"$select{'0chp'}>0ch+系</option>
+<option value="patio"$select{'patio'}>WEB PATIO系</option>
 </select>
 <input type="checkbox" name="kote" id="kote" value="1"$check{'kote'}><label for="kote">コテハンも表示</label>
 <input type="checkbox" name="leave" id="leave" value="1"$check{'leave'}><label for="leave">テキストを残す</label>
@@ -197,12 +200,30 @@ sub trip {
 		$_key =~ s/</&lt;/g;
 		$_key =~ s/>/&gt;/g;
 		$_key =~ s/"/&quot;/g;
+	} elsif ($mode eq 'patio') {
+		$_key =~ s/&/&amp;/g;
+		$_key =~ s/</&lt;/g;
+		$_key =~ s/>/&gt;/g;
+		$_key =~ s/"/&quot;/g;
+		$_key =~ s/'/&#39;/g;
+	} elsif ($mode eq '4chan') {
+		$_key =~ s/&/&amp;/g;
+		$_key =~ s/</&lt;/g;
+		$_key =~ s/>/&gt;/g;
+		$_key =~ s/"/&amp;quot;/g;
+	} elsif ($mode eq 'ebbs') {
+		$_key =~ s/&/&amp;/g;
+		$_key =~ s/</&amp;lt;/g;
+		$_key =~ s/>/&amp;gt;/g;
+		$_key =~ s/"/&quot;/g;
+		$_key =~ s/'/&#039;/g;
 	}
 	
 	# 文字コード関連
 	if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'strb' || 
 	    $mode eq 'vips' || $mode eq '0chp' || $mode eq 'bban' ||
-	    $mode eq 'machi') {
+	    $mode eq 'machi' || $mode eq 'patio' || $mode eq '4chan' ||
+	    $mode eq 'ebbs') {
 		$_key = encode('cp932', $_key);
 	} elsif ($mode eq 'open') {
 		$_key = encode('sjis', $_key);
@@ -218,18 +239,36 @@ sub trip {
 	} elsif ($mode eq 'machi') {
 		$_key =~ s/\x81\x9f/\x81\x9e/g;	# s/◆/◇/g
 		$_key =~ s/\x81\x94/#/g;		# s/＃/#/g
+	} elsif ($mode eq 'patio') {
+		$_key =~ s/\x81\x9f/\x81\x9e/g;	# s/◆/◇/g
 	}
 	
 	# 空キー不可
-	if (length($_key) == 0 && ($mode eq 'sc' || $mode eq 'strb' || $mode eq 'machi')) {
+	if (length($_key) == 0 &&
+	    ($mode eq 'sc' || $mode eq 'strb' || $mode eq 'machi' ||
+	     $mode eq '4chan')) {
 		
 		$type = 'notrip';
 		$key1 = $key;
 		$trip = undef;
 		
+	# patioなら11桁トリップ
+	} elsif ($mode eq 'patio') {
+		
+		$type = '11trip';
+		
+		$key1 = $key;
+		
+		# デフォルト設定のソルト
+		my $salt = 'ab';
+		
+		# 11桁トリップ生成
+		$trip = substr(crypt($_key, $salt), -11);
+		
 	# 10桁only掲示板 または キー長が12bytes未満なら10桁トリップ
 	} elsif (length($_key) < 12 ||
-	    $mode eq 'next' || $mode eq 'strb' || $mode eq 'machi') {
+	    $mode eq 'next' || $mode eq 'strb' || $mode eq 'machi' ||
+	    $mode eq '4chan' || $mode eq 'ebbs') {
 		
 		$type = '10trip';
 		
@@ -242,18 +281,19 @@ sub trip {
 			$salt = substr("${salt}H.", 0, 2);
 		} elsif ($mode eq 'open' || $mode eq 'bban') {
 			$salt = substr("${_key}H.G", 1, 2);
-		} elsif ($mode eq 'next') {
+		} elsif ($mode eq 'next' || $mode eq 'ebbs') {
 			$salt = substr("${_key}H.q", 1, 2);
-		} elsif ($mode eq 'sc' || $mode eq 'strb' || $mode eq 'machi') {
+		} elsif ($mode eq 'sc' || $mode eq 'strb' || $mode eq 'machi' ||
+		         $mode eq '4chan') {
 			# 空キー不可のため未確認(影響なし)
 			$salt = substr("${_key}H.G", 1, 2);
 		}
 		if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'open' || 
 		    $mode eq 'strb' || $mode eq 'vips' || $mode eq '0chp' ||
-		    $mode eq 'bban' || $mode eq 'machi') {
+		    $mode eq 'bban' || $mode eq 'machi' || $mode eq '4chan') {
 			$salt =~ s/[^\x2e-\x7a]/\./go;
 			$salt =~ tr/\x3a-\x40\x5b-\x60/A-Ga-f/;
-		} elsif ($mode eq 'next') {
+		} elsif ($mode eq 'next' || $mode eq 'ebbs') {
 			# [\x21-\x2d]の置換なし
 			$salt =~ s/[^\x21-\x7a]/\./go;
 			$salt =~ tr/\x21-\x2d\x3a-\x40\x5b-\x60/n-zA-Ga-f/;

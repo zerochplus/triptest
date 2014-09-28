@@ -18,6 +18,7 @@ sub main {
 		'mF1QH4PEr.E',	# patio
 		undef,			# 4chan / 不明
 		'sgO7UmMnWw',	# ebbs
+		undef,			# atchs
 	);
 	test('1',
 		'tsGpSwX8mo',	# net
@@ -32,6 +33,7 @@ sub main {
 		'GQP10890Qs2',	# patio
 		'tsGpSwX8mo',	# 4chan
 		'tsGpSwX8mo',	# ebbs
+		'tsGpSwX8mo',	# atchs
 	);
 	test('12345678',
 		'WBRXcNtpf.',	# net
@@ -46,6 +48,7 @@ sub main {
 		'1iBa.N.U2C6',	# patio
 		'WBRXcNtpf.',	# 4chan
 		'WBRXcNtpf.',	# ebbs
+		'WBRXcNtpf.',	# atchs
 	);
 	test('ｱｲｳｴｵｶｷｸ',
 		'XlUiP8mHCU',	# net
@@ -60,6 +63,7 @@ sub main {
 		'1iBa.N.U2C6',	# patio
 		'XlUiP8mHCU',	# 4chan
 		'XlUiP8mHCU',	# ebbs
+		'/c6GzZ6.UI',	# atchs
 	);
 	test('ｱ23ｴｵｶｷｸ',
 		'WBRXcNtpf.',	# net
@@ -74,6 +78,7 @@ sub main {
 		'1iBa.N.U2C6',	# patio
 		'WBRXcNtpf.',	# 4chan
 		'WBRXcNtpf.',	# ebbs
+		'WBRXcNtpf.',	# atchs
 	);
 	test('ｋａｍｉ',
 		'yGAhoNiShI',	# net
@@ -88,6 +93,7 @@ sub main {
 		'1Mq5Kc5CJKI',	# patio
 		'yGAhoNiShI',	# 4chan
 		'yGAhoNiShI',	# ebbs
+		'yGAhoNiShI',	# atchs
 	);
 	test('騨ﾚNWKJ諤',
 		'YYYYYYYYYY',	# net
@@ -102,6 +108,7 @@ sub main {
 		'pjHcUWPwSY6',	# patio
 		'YYYYYYYYYY',	# 4chan
 		'YYYYYYYYYY',	# ebbs
+		'YYYYYYYYYY',	# atchs
 	);
 	test('#828b8281828d8289',
 		'yGAhoNiShI',	# net
@@ -116,6 +123,7 @@ sub main {
 		'9f2.YIAJSW.',	# patio
 		'NXUZ00CMW6',	# 4chan
 		'NXUZ00CMW6',	# ebbs
+		'NXUZ00CMW6',	# atchs
 	);
 	test('#828b8281828d8289.',
 		'yGAhoNiShI',	# net
@@ -130,6 +138,7 @@ sub main {
 		'9f2.YIAJSW.',	# patio
 		'NXUZ00CMW6',	# 4chan
 		'NXUZ00CMW6',	# ebbs
+		'NXUZ00CMW6',	# atchs
 	);
 	test('#828b8281828d8289..',
 		'yGAhoNiShI',	# net
@@ -144,6 +153,7 @@ sub main {
 		'9f2.YIAJSW.',	# patio
 		'NXUZ00CMW6',	# 4chan
 		'NXUZ00CMW6',	# ebbs
+		'NXUZ00CMW6',	# atchs
 	);
 	test('#3132333435363738',
 		'XlUiP8mHCU',	# net
@@ -158,6 +168,7 @@ sub main {
 		'jATbp6Ebioo',	# patio
 		'ULUFJt9VDM',	# 4chan
 		'ULUFJt9VDM',	# ebbs
+		'ULUFJt9VDM',	# atchs
 	);
 	test('#31323334353637382',
 		'1tWQFkUcLU',	# net
@@ -172,6 +183,7 @@ sub main {
 		'jATbp6Ebioo',	# patio
 		'ULUFJt9VDM',	# 4chan
 		'ULUFJt9VDM',	# ebbs
+		'ULUFJt9VDM',	# atchs
 	);
 	test('#313233343536373823',
 		'WBRXcNtpf.',	# net
@@ -186,6 +198,7 @@ sub main {
 		'jATbp6Ebioo',	# patio
 		'ULUFJt9VDM',	# 4chan
 		'ULUFJt9VDM',	# ebbs
+		'ULUFJt9VDM',	# atchs
 	);
 	test('#3100000000000000H.',
 		'tsGpSwX8mo',	# net
@@ -200,6 +213,7 @@ sub main {
 		'0HsMU3YYzL6',	# patio
 		'6O5ptllf5k',	# 4chan
 		'6O5ptllf5k',	# ebbs
+		'6O5ptllf5k',	# atchs
 	);
 	test('123456789',
 		'WBRXcNtpf.',	# net
@@ -214,6 +228,7 @@ sub main {
 		'1iBa.N.U2C6',	# patio
 		'WBRXcNtpf.',	# 4chan
 		'WBRXcNtpf.',	# ebbs
+		'WBRXcNtpf.',	# atchs
 	);
 	test('1234567890',
 		'WBRXcNtpf.',	# net
@@ -228,6 +243,7 @@ sub main {
 		'1iBa.N.U2C6',	# patio
 		'WBRXcNtpf.',	# 4chan
 		'WBRXcNtpf.',	# ebbs
+		'WBRXcNtpf.',	# atchs
 	);
 	test('12345678901',
 		'WBRXcNtpf.',	# net
@@ -242,6 +258,7 @@ sub main {
 		'1iBa.N.U2C6',	# patio
 		'WBRXcNtpf.',	# 4chan
 		'WBRXcNtpf.',	# ebbs
+		'WBRXcNtpf.',	# atchs
 	);
 	test('123456789012',
 		'jZk8zfYo4m4X',	# net
@@ -256,6 +273,7 @@ sub main {
 		'1iBa.N.U2C6',	# patio
 		'WBRXcNtpf.',	# 4chan
 		'WBRXcNtpf.',	# ebbs
+		'WBRXcNtpf.',	# atchs
 	);
 	test('1234567890123',
 		'CNfebL9sP6Ci',	# net
@@ -270,6 +288,7 @@ sub main {
 		'1iBa.N.U2C6',	# patio
 		'WBRXcNtpf.',	# 4chan
 		'WBRXcNtpf.',	# ebbs
+		'WBRXcNtpf.',	# atchs
 	);
 	test('あいうえおか',
 		'N0mUb9Yq8DyS',	# net
@@ -284,6 +303,7 @@ sub main {
 		'yWz95C3I8Io',	# patio
 		'AU/OjWxByc',	# 4chan
 		'AU/OjWxByc',	# ebbs
+		'AU/OjWxByc',	# atchs
 	);
 	test('$2345678901',
 		'BaNAE36vrg',	# net
@@ -298,6 +318,7 @@ sub main {
 		'3JCiiSIcJns',	# patio
 		'BaNAE36vrg',	# 4chan
 		'BaNAE36vrg',	# ebbs
+		'BaNAE36vrg',	# atchs
 	);
 	test('$23456789012',
 		'???',				# net
@@ -312,6 +333,7 @@ sub main {
 		'3JCiiSIcJns',		# patio
 		'BaNAE36vrg',		# 4chan
 		'BaNAE36vrg',		# ebbs
+		'BaNAE36vrg',		# atchs
 	);
 	test('$..........2',
 		'???',				# net
@@ -326,6 +348,7 @@ sub main {
 		'02NgA38l.qI',		# patio
 		'bwOnxXJup.',		# 4chan
 		'bwOnxXJup.',		# ebbs
+		'bwOnxXJup.',		# atchs
 	);
 	test('$｡3456789012',
 		'???',				# net
@@ -340,6 +363,7 @@ sub main {
 		'ns3QsnnftmU',		# patio
 		'RhQIlLvzs6',		# 4chan
 		'RhQIlLvzs6',		# ebbs
+		'RhQIlLvzs6',		# atchs
 	);
 	test('$｡1008343131',
 		'???',				# net
@@ -354,6 +378,7 @@ sub main {
 		'UJGgZRgio5A',		# patio
 		'lEjCdVtEDo',		# 4chan
 		'lEjCdVtEDo',		# ebbs
+		'lEjCdVtEDo',		# atchs
 	);
 	test('$ｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵ',
 		'???',				# net
@@ -368,6 +393,7 @@ sub main {
 		'uzipAJnBCXw',		# patio
 		'Nxf9REt3eA',		# 4chan
 		'Nxf9REt3eA',		# ebbs
+		'Nxf9REt3eA',		# atchs
 	);
 	test('#23456789012',
 		'???',			# net
@@ -382,6 +408,7 @@ sub main {
 		'/kQ.HUDyE.2',	# patio
 		'y3.ScW8dbE',	# 4chan
 		'y3.ScW8dbE',	# ebbs
+		'y3.ScW8dbE',	# atchs
 	);
 	test('#1234567890123456..abc',
 		'???',			# net
@@ -396,6 +423,7 @@ sub main {
 		'OYvAb3AA/Vc',	# patio
 		'Oi/x1UMuw.',	# 4chan
 		'Oi/x1UMuw.',	# ebbs
+		'Oi/x1UMuw.',	# atchs
 	);
 	test('ホムホム',
 		'QD4TDVpNOM',	# net
@@ -410,6 +438,7 @@ sub main {
 		'nPRdUdp37f2',	# patio
 		'L809q.Wvdk',	# 4chan
 		'L809q.Wvdk',	# ebbs
+		'L809q.Wvdk',	# atchs
 	);
 	test('#837a8380837a8380z.',
 		'QD4TDVpNOM',	# net
@@ -424,6 +453,7 @@ sub main {
 		'lvp6WTecHrI',	# patio
 		'RzVraEhVVs',	# 4chan
 		'RzVraEhVVs',	# ebbs
+		'RzVraEhVVs',	# atchs
 	);
 	test('◆●★',
 		'dTHrbNrOw.',	# net
@@ -438,6 +468,7 @@ sub main {
 		'ub6VtoVDrhM',	# patio
 		'dTHrbNrOw.',	# 4chan
 		'dTHrbNrOw.',	# ebbs
+		'nDesIZyzu6',	# atchs
 	);
 	test('■▲▼',
 		'GExJOqup6A',	# net
@@ -452,6 +483,7 @@ sub main {
 		'au8rdKNKXv.',	# patio
 		'GExJOqup6A',	# 4chan
 		'GExJOqup6A',	# ebbs
+		'GExJOqup6A',	# atchs
 	);
 	test('◆★',
 		'9hhQmDPmK2',	# net
@@ -466,6 +498,7 @@ sub main {
 		'bhqKOtOojug',	# patio
 		'9hhQmDPmK2',	# 4chan
 		'9hhQmDPmK2',	# ebbs
+		'DVlEzgbdkE',	# atchs
 	);
 	test('<>"&',
 		'f0abm3NbDw',	# net
@@ -480,6 +513,7 @@ sub main {
 		'6fnK3RL57.6',	# patio
 		'Gw/f5wZwNg',	# 4chan
 		'LI9hP7a95o',	# ebbs
+		'Gw/f5wZwNg',	# atchs
 	);
 	test('<>',
 		'3wNccY4njg',	# net
@@ -494,6 +528,7 @@ sub main {
 		'6fnK3RL57.6',	# patio
 		'Gw/f5wZwNg',	# 4chan
 		'LI9hP7a95o',	# ebbs
+		'Gw/f5wZwNg',	# atchs
 	);
 	test('"',
 		'4eqVTkonjE',	# net
@@ -508,6 +543,7 @@ sub main {
 		'cHRF68MSGdc',	# patio
 		'RYRu.UCnt.',	# 4chan
 		'gt1azVccY2',	# ebbs
+		'gt1azVccY2',	# atchs
 	);
 	test("'",
 		'8/08awL.AE',	# net
@@ -522,6 +558,7 @@ sub main {
 		'QcqA97SR2PQ',	# patio
 		'8/08awL.AE',	# 4chan
 		'UtX4XpdDog',	# ebbs
+		'2BBQL3Q2fE',	# atchs
 	);
 	test('&',
 		'2r2Ga7GHRc',	# net
@@ -536,6 +573,7 @@ sub main {
 		'zcjb1/2NNqA',	# patio
 		'MhCJJ7GVT.',	# 4chan
 		'MhCJJ7GVT.',	# ebbs
+		'MhCJJ7GVT.',	# atchs
 	);
 	test('!',
 		'KNs1o0VDv6',	# net
@@ -550,6 +588,7 @@ sub main {
 		'WL1zJlMqfCM',	# patio
 		'KNs1o0VDv6',	# 4chan
 		'KNs1o0VDv6',	# ebbs
+		'KNs1o0VDv6',	# atchs
 	);
 	test(',',
 		'YeQQgdCJE6',	# net
@@ -564,6 +603,7 @@ sub main {
 		'eXdD4qEaHlQ',	# patio
 		'YeQQgdCJE6',	# 4chan
 		'YeQQgdCJE6',	# ebbs
+		'YeQQgdCJE6',	# atchs
 	);
 	test('1234567&',
 		'q3.yfaIC5s',	# net
@@ -578,6 +618,7 @@ sub main {
 		'n0BFJyHNYuw',	# patio
 		'q3.yfaIC5s',	# 4chan
 		'q3.yfaIC5s',	# ebbs
+		'q3.yfaIC5s',	# atchs
 	);
 	test('1234567"',
 		'4qJVtuc8yc',	# net
@@ -592,6 +633,7 @@ sub main {
 		'n0BFJyHNYuw',	# patio
 		'q3.yfaIC5s',	# 4chan
 		'q3.yfaIC5s',	# ebbs
+		'q3.yfaIC5s',	# atchs
 	);
 	test('＃',
 		'u2YjtUz8MU',	# net
@@ -606,6 +648,7 @@ sub main {
 		'5dDmbWcvHQ2',	# patio
 		'e57oZ1fb1o',	# 4chan
 		'e57oZ1fb1o',	# ebbs
+		'e57oZ1fb1o',	# atchs
 	);
 	test(' ＃',
 		'68NHrw0u9M',	# net
@@ -620,6 +663,7 @@ sub main {
 		'6P5FYZ3aJ3k',	# patio
 		'PlnfWZhzek',	# 4chan
 		'PlnfWZhzek',	# ebbs
+		'PlnfWZhzek',	# atchs
 	);
 	test('＃＃',
 		'xSK1SiC5MI',	# net
@@ -634,6 +678,7 @@ sub main {
 		'Eewhm8s9K32',	# patio
 		'dn4m8J5vno',	# 4chan
 		'dn4m8J5vno',	# ebbs
+		'dn4m8J5vno',	# atchs
 	);
 	test('＝煤＃',
 		'0ZaZ6Ph9YM',	# net
@@ -648,6 +693,7 @@ sub main {
 		'BzKBQH5tylA',	# patio
 		'pnkCIOJmhY',	# 4chan
 		'pnkCIOJmhY',	# ebbs
+		'pnkCIOJmhY',	# atchs
 	);
 	test('123456789012＃',
 		'RITzbxS2I3J9',	# net
@@ -662,6 +708,7 @@ sub main {
 		'1iBa.N.U2C6',	# patio
 		'WBRXcNtpf.',	# 4chan
 		'WBRXcNtpf.',	# ebbs
+		'WBRXcNtpf.',	# atchs
 	);
 	test('1234567890＃',
 		'WBRXcNtpf.',	# net
@@ -676,6 +723,7 @@ sub main {
 		'1iBa.N.U2C6',	# patio
 		'WBRXcNtpf.',	# 4chan
 		'WBRXcNtpf.',	# ebbs
+		'WBRXcNtpf.',	# atchs
 	);
 	test('＃3456789012',
 		'lg6Q/4u.i.',	# net
@@ -690,6 +738,7 @@ sub main {
 		'b3B23rtXcYE',	# patio
 		'oLUwO8zJDE',	# 4chan
 		'oLUwO8zJDE',	# ebbs
+		'oLUwO8zJDE',	# atchs
 	);
 	test('＃31318194313100001.',
 		'7ZE59iVq1I',	# net
@@ -704,6 +753,7 @@ sub main {
 		'3quFX4KCbCA',	# patio
 		'jcRaOUsIrk',	# 4chan
 		'jcRaOUsIrk',	# ebbs
+		'jcRaOUsIrk',	# atchs
 	);
 	test('＝噤＝氈',
 		'Pcn5KeK8IQ',	# net
@@ -718,6 +768,7 @@ sub main {
 		'TbfudtHiano',	# patio
 		'Pcn5KeK8IQ',	# 4chan
 		'Pcn5KeK8IQ',	# ebbs
+		'Pcn5KeK8IQ',	# atchs
 	);
 	test('fusianasan',
 		'M2TLe2H2No',	# net
@@ -732,6 +783,7 @@ sub main {
 		'IqmJD4plbT6',	# patio
 		'M2TLe2H2No',	# 4chan
 		'M2TLe2H2No',	# ebbs
+		'M2TLe2H2No',	# atchs
 	);
 	test('①Ⅰ㍉㈱',
 		'Az6yZqa0I2',	# net
@@ -746,6 +798,7 @@ sub main {
 		'CuOm6lMouYE',	# patio
 		'Az6yZqa0I2',	# 4chan
 		'Az6yZqa0I2',	# ebbs
+		'Vyfxi/dpqw',	# atchs
 	);
 	test('～',
 		'Fg7tQabTMc',	# net
@@ -760,6 +813,22 @@ sub main {
 		'31jCORTn/1I',	# patio
 		'Fg7tQabTMc',	# 4chan
 		'Fg7tQabTMc',	# ebbs
+		'Fg7tQabTMc',	# atchs
+	);
+	test('－',
+		'29g6Md5az6',	# net
+		'29g6Md5az6',	# sc
+		'cPUZU5OGFs',	# open
+		'HMyU06RKY6',	# next
+		'29g6Md5az6',	# strb
+		'29g6Md5az6',	# vips
+		'29g6Md5az6',	# 0chp
+		'29g6Md5az6',	# bban
+		'29g6Md5az6',	# machi
+		'TmiaNz4z2dc',	# patio
+		'29g6Md5az6',	# 4chan
+		'29g6Md5az6',	# ebbs
+		'29g6Md5az6',	# atchs
 	);
 	test('一一',
 		'b3B4i2sLpY',	# net
@@ -774,6 +843,7 @@ sub main {
 		'wrFukDbqx0g',	# patio
 		'b3B4i2sLpY',	# 4chan
 		'b3B4i2sLpY',	# ebbs
+		'b3B4i2sLpY',	# atchs
 	);
 	test('0 !',
 		'ZIJx7G/pyg',	# net
@@ -788,6 +858,7 @@ sub main {
 		'/niSpUBWi4s',	# patio
 		'ZIJx7G/pyg',	# 4chan
 		'JB1xkjXQ86',	# ebbs
+		'ZIJx7G/pyg',	# atchs
 	);
 	test('0-:',
 		'NE0mkZ2TpI',	# net
@@ -802,6 +873,7 @@ sub main {
 		'FQ6sqxr6Fqo',	# patio
 		'NE0mkZ2TpI',	# 4chan
 		'tHGdgYtE5Y',	# ebbs
+		'NE0mkZ2TpI',	# atchs
 	);
 	test('0@[',
 		'gkmryCvLz6',	# net
@@ -816,6 +888,7 @@ sub main {
 		'Vrukgc3M1f.',	# patio
 		'gkmryCvLz6',	# 4chan
 		'gkmryCvLz6',	# ebbs
+		'gkmryCvLz6',	# atchs
 	);
 	test('0`{',
 		'WtDsB59Wrk',	# net
@@ -830,6 +903,7 @@ sub main {
 		'2vw7A38kVoU',	# patio
 		'WtDsB59Wrk',	# 4chan
 		'WtDsB59Wrk',	# ebbs
+		'WtDsB59Wrk',	# atchs
 	);
 	test('0|}',
 		'M6kra150Vk',	# net
@@ -844,6 +918,7 @@ sub main {
 		'/yKxoYDejWg',	# patio
 		'M6kra150Vk',	# 4chan
 		'M6kra150Vk',	# ebbs
+		'M6kra150Vk',	# atchs
 	);
 	test("0\x090",
 		'sXoB65CSvY',	# net
@@ -858,12 +933,13 @@ sub main {
 		'j80bUaYWE9A',	# patio
 		'sXoB65CSvY',	# 4chan
 		'sXoB65CSvY',	# ebbs
+		'sXoB65CSvY',	# atchs
 	);
 }
 
 sub test {
 	my ($key, @expects) = @_;
-	my @modes = qw(net sc open next strb vips 0chp bban machi patio 4chan ebbs);
+	my @modes = qw(net sc open next strb vips 0chp bban machi patio 4chan ebbs atchs);
 	my @results = ();
 	for my $i (0 .. $#modes) {
 		my ($result, undef, undef, undef, undef) = trip($key, $modes[$i]);

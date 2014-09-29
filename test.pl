@@ -1,10 +1,10 @@
 use utf8;
 use strict;
+use Encode;
 
 sub main {
 	require 'trip.cgi';
 	binmode(STDOUT);
-	binmode(STDOUT, ':encoding(cp932)');
 	
 	test('',
 		'net'   => 'jPpg5.obl6',
@@ -538,18 +538,107 @@ sub main {
 		'bban'  => 'AOGu5v68Us',	# ##8300000000000000..
 	);
 	
-	test('孥밴',
-		'atchs' => 'M2oL7qG6dM',	##e34c838b88b20000L.
+	# E4 BF A1 E8 BB BD : 信軽 / 菫｡霆ｽ / 篆∴蚕
+	test('信軽',	# E4 BF A1 E8 BB BD => 90 4D 8C 79 (from utf8 to sjis)
+		'atchs' => '7kFWX/qQYo',	# ##904d8c7900000000M.
 	);
-	test('絖ル梓',
-		'atchs' => 'M2oL7qG6dM',	##e34c838b88b20000L.
+	test('菫｡霆ｽ',	# E8 8F AB EF BD A1 E9 9C 86 EF BD BD => E4 BF A1 E8 BB BD (from utf8 to sjis)
+		'atchs' => 'APAvffTKNY',	# ##e4bfa1e8bbbd0000..
 	);
-	test("\t孥밴",
-		'atchs' => 'IA.fJI5mHQ',	##09e34c838b88b200.L
+	test('篆∴蚕',	# E7 AF 86 E2 88 B4 E8 9A 95 => E2 BD 81 88 8E 5C (from utf8 to sjis)
+		'atchs' => 'xV10Cw674M',	# ##e2bd81888e5c0000..
 	);
-	test('맨㹭',
-		'atchs' => 'l9OGNUEGNg',	##3f2863392d000000..
+	# EB A7 A8 E3 B9 AD : 맨㹭 / ?ｨ羯ｭ / 襷?広
+	test('맨㹭',	# EB A7 A8 E3 B9 AD => 3F A8 E3 B9 AD (as sjis)
+		'atchs' => 'l9OGNUEGNg',	# ##3fa8e3b9ad000000.. #?ｨ羯ｭ
 	);
+	# E5 AD A5 EB B0 B4 : 孥밴 / 蟄??ｴ / 絖ル梓
+	test('孥밴',	# E5 AD A5 EB B0 B4 => E3 4C 83 8B 88 B2 (from eucjp to sjis)
+		'atchs' => 'M2oL7qG6dM',	# ##e34c838b88b20000L.
+	);
+	test('絖ル梓',	# E7 B5 96 E3 83 AB E6 A2 93 => E3 4C 83 8B 88 B2 (from utf8 to sjis)
+		'atchs' => 'M2oL7qG6dM',	# ##e34c838b88b20000L.
+	);
+	# E5 B3 B1 E3 A2 BE : 峱㢾 / 蟲ｱ罎ｾ / 絣宴⊂
+	test('峱㢾',	# E5 B3 B1 E3 A2 BE => E3 52 89 83 81 BC (from eucjp to sjis)
+		'atchs' => 'V3HdQo70SA',	# ##e352898381bc0000R.
+	);
+	test('蟲ｱ罎ｾ',	# E8 9F B2 EF BD B1 E7 BD 8E EF BD BE => E5 B3 B1 E3 A2 BE (from utf8 to sjis)
+		'atchs' => 'AABymBxNrU',	# ##e5b3b1e3a2be0000..
+	);
+	test('絣宴⊂',	# E7 B5 A3 E5 AE B4 E2 8A 82 => E3 52 89 83 81 BC (from utf8 to sjis)
+		'atchs' => 'V3HdQo70SA',	# ##e352898381bc0000R.
+	);
+	# E7 BC BA E5 BF B3 : 缺忳 / 郛ｺ蠢ｳ / 膽阪審
+	test('缺忳',	# E7 BC BA E5 BF B3 (as utf8)
+		'atchs' => 'WvHcc0tL/g',	# ##e7bcbae5bfb30000..
+	);
+	test('郛ｺ蠢ｳ',	# E9 83 9B EF BD BA E8 A0 A2 EF BD B3 => E7 BC BA E5 BF B3 (from utf8 to sjis)
+		'atchs' => 'WvHcc0tL/g',	# ##e7bcbae5bfb30000..
+	);
+	test('膽阪審',	# E8 86 BD E9 98 AA E5 AF A9 => E4 5B 8D E3 90 52 (from utf8 to sjis)
+		'atchs' => 'nXqoPlEsW.',	# ##e45b8de390520000a.
+	);
+	# E6 AD A3 E8 B9 AE : 正蹮 / 豁｣雹ｮ / 罩ｈ庚
+	test('正蹮',	# E6 AD A3 E8 B9 AE (as utf8)
+		'atchs' => 'sJaNondzgA',	# ##e6ada3e8b9ae0000..
+	);
+	test('豁｣雹ｮ',	# E8 B1 81 EF BD A3 E9 9B B9 EF BD AE => E6 AD A3 E8 B9 AE (from utf8 to sjis)
+		'atchs' => 'sJaNondzgA',	# ##e6ada3e8b9ae0000..
+	);
+	test('罩ｈ庚',	# E7 BD A9 EF BD 88 E5 BA 9A => E3 AB 82 88 8D 4D (from utf8 to sjis)
+		'atchs' => 'JF6srNhdqE',	# ##e3ab82888d4d0000..
+	);
+	# E6 A4 BB E4 BE AA : 椻侪 / 讀ｻ萓ｪ / 罎私妾
+	test('椻侪',	# E6 A4 BB E4 BE AA (as utf8)
+		'atchs' => '/ZlVOBaCDY',	# ##e6a4bbe4beaa0000..
+	);
+	test('讀ｻ萓ｪ',	# E8 AE 80 EF BD BB E8 90 93 EF BD AA => E6 A4 BB E4 BE AA (from utf8 to sjis)
+		'atchs' => '/ZlVOBaCDY',	# ##e6a4bbe4beaa0000..
+	);
+	test('罎私妾',	# E7 BD 8E E7 A7 81 E5 A6 BE => E3 A2 8E 84 8F A8 (from utf8 to sjis)
+		'atchs' => 'by3Lhxz1H6',	# ##e3a28e848fa80000..
+	);
+	# E5 AA BE E9 A1 B6 : 媾顶 / 蟐ｾ鬘ｶ / 紵冗ゞ
+	test('媾顶',	# E5 AA BE E9 A1 B6 (as utf8)
+		'atchs' => '4o.Bpl1ORc',	# ##e5aabee9a1b60000..
+	);
+	test('蟐ｾ鬘ｶ',	# E8 9F 90 EF BD BE E9 AC 98 EF BD B6 => E5 AA BE E9 A1 B6 (from utf8 to sjis)
+		'atchs' => '4o.Bpl1ORc',	# ##e5aabee9a1b60000..
+	);
+	test('紵冗ゞ',	# E7 B4 B5 E5 86 97 E3 82 9E => E3 49 8F E7 81 55 (from utf8 to sjis)
+		'atchs' => 'p.CsKTRhlE',	# ##e3498fe781550000I.
+	);
+	# E3 B6 BD EC B9 AA : 㶽칪 / 羝ｽ?ｪ / 禧曙巧
+	test('㶽칪',	# E3 B6 BD EC B9 AA => E2 55 8F 8C 8D 49 (from eucjp to sjis)
+		'atchs' => 'KLCGM8uxXI',	# ##e2558f8c8d490000U.
+	);
+	test('禧曙巧',	# E7 A6 A7 E6 9B 99 E5 B7 A7 => E2 55 8F 8C 8D 49 (from utf8 to sjis)
+		'atchs' => 'KLCGM8uxXI',	# ##e2558f8c8d490000U.
+	);
+	# EC B9 A8 E5 A4 BB : 침夻 / ?ｨ螟ｻ / 豺?せ
+	test('침夻',	# EC B9 A8 E5 A4 BB => 3F A8 E5 A4 BB (as sjis)
+		'atchs' => 'Hyot5W8Vhw',	# ##3fa8e5a4bb000000.. #?ｨ螟ｻ
+	);
+	# E7 B4 A6 E5 BC A9 : 紦弩 / 邏ｦ蠑ｩ / 膣?而
+	test('紦弩',	# E7 B4 A6 E5 BC A9 (as utf8)
+		'atchs' => '53rES.iYkg',	# ##e7b4a6e5bca90000..
+	);
+	test('邏ｦ蠑ｩ',	# E9 82 8F EF BD A6 E8 A0 91 EF BD A9 => E7 B4 A6 E5 BC A9 (from utf8 to sjis)
+		'atchs' => '53rES.iYkg',	# ##e7b4a6e5bca90000..
+	);
+#	# 
+#	test('',	# 
+#		'atchs' => '',	# 
+#	);
+#	test('',	# 
+#		'atchs' => '',	# 
+#	);
+#	test('',	# 
+#		'atchs' => '',	# 
+#	);
+	print "end.\n";
+	return 0;
 }
 
 sub test {
@@ -565,15 +654,15 @@ sub test {
 			$diff = 1;
 		}
 		if ($diff) {
-			print "key #$key\n";
+			print encode('cp932', "key #$key\n");
 			print "  mode $mode\n";
 			if (defined $result) {
-				print "  result $result\n";
+				print encode('cp932', "  result $result\n");
 			} else {
 				print "  result [no trip]\n";
 			}
 			if (defined $expects{$mode}) {
-				print "  expect $expects{$mode}\n";
+				print encode('cp932', "  expect $expects{$mode}\n");
 			} else {
 				print "  expect [no trip]\n";
 			}

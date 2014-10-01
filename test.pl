@@ -565,7 +565,7 @@ sub test_character {
 		'net'   => 'X29NAsr4vY',	# ##81e0000000000000.H
 		'sc'    => 'X29NAsr4vY',	# ##81e0000000000000.H
 		'open'  => 'X29NAsr4vY',	# ##81e0000000000000.H
-		'next'  => '',	# #
+		'next'  => 'pWJiJpaJFQ',	# ##e289920000000000..
 		'strb'  => 'X29NAsr4vY',	# ##81e0000000000000.H
 		'vips'  => 'X29NAsr4vY',	# ##81e0000000000000.H
 		'0chp'  => 'X29NAsr4vY',	# ##81e0000000000000.H
@@ -580,7 +580,7 @@ sub test_character {
 		'net'   => 'O1epwnpXkI',	# ##8740000000000000GH
 		'sc'    => 'O1epwnpXkI',	# ##8740000000000000GH
 		'open'  => 'cPUZU5OGFs',	# ##3f00000000000000H.
-		'next'  => '',	# #
+		'next'  => 'jtD6pvN4EA',	# ##e291a00000000000..
 		'strb'  => 'O1epwnpXkI',	# ##8740000000000000GH
 		'vips'  => 'O1epwnpXkI',	# ##8740000000000000GH
 		'0chp'  => 'O1epwnpXkI',	# ##8740000000000000GH
@@ -625,7 +625,7 @@ sub test_character {
 		'net'   => '6Y7URAxU/w',	# ##8782000000000000.H
 		'sc'    => '6Y7URAxU/w',	# ##8782000000000000.H
 		'open'  => 'cPUZU5OGFs',	# ##3f00000000000000H.
-		'next'  => '',	# #
+		'next'  => 'mZ5VUIGw1w',	# ##e284960000000000..
 		'strb'  => '6Y7URAxU/w',	# ##8782000000000000.H
 		'vips'  => '6Y7URAxU/w',	# ##8782000000000000.H
 		'0chp'  => '6Y7URAxU/w',	# ##8782000000000000.H
@@ -700,7 +700,7 @@ sub test_character {
 		'net'   => 'EL2CIVwtV6',	# ##815c000000000000bH
 		'sc'    => 'EL2CIVwtV6',	# ##815c000000000000bH
 		'open'  => 'EL2CIVwtV6',	# ##815c000000000000bH
-		'next'  => '',	# #
+		'next'  => 'VhoNrmdIjI',	# ##e280950000000000..
 		'strb'  => 'EL2CIVwtV6',	# ##815c000000000000bH
 		'vips'  => 'EL2CIVwtV6',	# ##815c000000000000bH
 		'0chp'  => 'EL2CIVwtV6',	# ##815c000000000000bH
@@ -715,7 +715,7 @@ sub test_character {
 		'net'   => 'Fg7tQabTMc',	# ##8160000000000000fH
 		'sc'    => 'Fg7tQabTMc',	# ##8160000000000000fH
 		'open'  => 'cPUZU5OGFs',	# ##3f00000000000000H.
-		'next'  => '',	# #
+		'next'  => '2nUHWotKCQ',	# ##efbd9e0000000000..
 		'strb'  => 'Fg7tQabTMc',	# ##8160000000000000fH
 		'vips'  => 'Fg7tQabTMc',	# ##8160000000000000fH
 		'0chp'  => 'Fg7tQabTMc',	# ##8160000000000000fH
@@ -745,7 +745,7 @@ sub test_character {
 		'net'   => '29g6Md5az6',	# ##817c000000000000.H
 		'sc'    => '29g6Md5az6',	# ##817c000000000000.H
 		'open'  => 'cPUZU5OGFs',	# ##3f00000000000000H.
-		'next'  => '',	# #
+		'next'  => 'HMyU06RKY6',	# ##efbc8d0000000000..
 		'strb'  => '29g6Md5az6',	# ##817c000000000000.H
 		'vips'  => '29g6Md5az6',	# ##817c000000000000.H
 		'0chp'  => '29g6Md5az6',	# ##817c000000000000.H
@@ -936,32 +936,50 @@ sub test_character {
 		'ebbs'  => '3HK.lhpkUE',	# ##fae0000000000000.H
 		'atchs' => 'cPUZU5OGFs',	# ##3f00000000000000H.
 	);
-	test('骶',	# U+9AB6 (E9 AA B6) in eucjp
+	test('骶',	# U+9AB6 (E9 AA B6) in JIS X 0212
 		'open'  => 'cPUZU5OGFs',	# ##3f00000000000000H.
 		'next'  => '',	# #
 		'strb'  => 'j0srOJyByE',	# ##81ac000000000000.H
 		'4chan' => '',	# #
 		'atchs' => 'AgAJj0YCtM',	# ##e9aab60000000000..
 	);
-	test('杮',	# U+676E (E6 9D AE) in eucjp
+	test('杮',	# U+676E (E6 9D AE) in JIS X 0212
 		'open'  => 'cPUZU5OGFs',	# ##3f00000000000000H.
 		'next'  => '',	# #
 		'strb'  => 'j0srOJyByE',	# ##81ac000000000000.H
 		'4chan' => '',	# #
 		'atchs' => 'gFVntGVfmM',	# ##e69dae0000000000..
 	);
-	test("\x{00a5}",	# U+00A5 (C2 A5) in utf8
+	test("\x{00a5}",	# '¥' U+00A5 (C2 A5) in JIS X 0201
 		'open'  => 'cPUZU5OGFs',	# ##3f00000000000000H.
-		'next'  => '',	# #
+		'next'  => 'oA2ex0/x92',	# ##c2a5000000000000.H
 		'4chan' => '',	# #
 		'atchs' => 'oA2ex0/x92',	# ##c2a5000000000000.H
 	);
-	test("\x{203e}",	# U+203E (E2 80 BE) in utf8
+	test("\x{203e}",	# '‾' U+203E (E2 80 BE) in JIS X 0201?
 		'open'  => 'cPUZU5OGFs',	# ##3f00000000000000H.
-		'next'  => '',	# #
+		'next'  => 'ChbEnx9JSM',	# ##e280be0000000000..
 		'4chan' => '',	# #
 		'atchs' => 'ChbEnx9JSM',	# ##e280be0000000000..
 	);
+	test("\x{304b}\x{309a}",	# 'か゚' U+304B U+309A (E3 81 8B E3 82 9A) in Unicode 3.0
+		'open'  => '',	# #
+		'next'  => 'sxQbPeczMg',	# ##e3818be3829a0000..
+		'4chan' => '',	# #
+		'atchs' => '',	# #
+	);
+	test("\x{214a}",	# '⅊' U+214A (E2 85 8A) in Unicode 3.2
+		'open'  => '',	# #
+		'next'  => 'oEm/SUE1.w',	# ##e2858a0000000000..
+		'4chan' => '',	# #
+		'atchs' => '',	# #
+	);
+#	test("\x{}",	# U+ ()
+#		'open'  => '',	# #
+#		'next'  => '',	# #
+#		'4chan' => '',	# #
+#		'atchs' => '',	# #
+#	);
 }
 
 sub test_encoding {
@@ -1086,7 +1104,28 @@ sub test {
 			$diff = 1;
 		}
 		if ($diff) {
-			print 'key #'.encode($OUTENC, $key)."\n";
+			if (utf8::is_utf8($key)) {
+				my $valid = 1;
+				my $outkey = encode($OUTENC, $key, sub { $valid = 0; '?' });
+				if ($valid) {
+					printf "key #$outkey\n";
+				} else {
+					my $keyhex = encode('utf8', $key);
+					$keyhex =~ s/(.)/sprintf('%02X ', ord($1))/egso;
+					$keyhex =~ s/ $//so;
+					printf "key #$outkey ($keyhex)\n";
+				}
+			} else {
+				my $outkey = $key;
+				if ($outkey =~ /[^\x20-\x7e]/so) {
+					my $keyhex = $key;
+					$keyhex =~ s/(.)/sprintf('%02X ', ord($1))/egso;
+					$keyhex =~ s/ $//so;
+					printf "key #$outkey ($keyhex)\n";
+				} else {
+					printf "key #$outkey\n";
+				}
+			}
 			print "  mode $mode\n";
 			if (defined $result) {
 				print '  result '.encode($OUTENC, $result)."\n";

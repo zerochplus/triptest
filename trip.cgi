@@ -8,7 +8,7 @@
 #
 #	This program made by windyakin ◆windyaking ( http://windyakin.net/ )
 #
-#	Last up date 2014.09.26
+#	Last up date 2014.10.01
 #
 #-------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ use CGI;
 use Crypt::UnixCrypt;
 use Digest::SHA::PurePerl qw(sha1_base64);
 
-our $VERSION = '20140926';
+our $VERSION = '20141001';
 my @modes = qw(net sc open next strb vips 0chp bban machi patio 4chan ebbs atchs);
 
 sub main {
@@ -64,7 +64,7 @@ EOT
 		
 		my @lines = split(/\r?\n/, $text);
 		foreach my $line (@lines) {
-			if ($line =~ /#([\s\S]*)\z/) {
+			if ($line =~ /#(.*)$/so) {
 				my ($trip, $key1, $key2, $key, $type) = trip($1, $mode);
 				
 				$trip = sanitize($trip);
@@ -140,17 +140,17 @@ EOT
 #-------------------------------------------------------------------------------
 sub sanitize {
 	my ($str) = @_;
-	$str =~ s/&/&amp;/g;
-	$str =~ s/</&lt;/g;
-	$str =~ s/>/&gt;/g;
-	$str =~ s/"/&quot;/g;
-	$str =~ s/'/&#39;/g;
+	$str =~ s/&/&amp;/go;
+	$str =~ s/</&lt;/go;
+	$str =~ s/>/&gt;/go;
+	$str =~ s/"/&quot;/go;
+	$str =~ s/'/&#39;/go;
 	return $str;
 }
 
 #-------------------------------------------------------------------------------
 #
-#	トリップ生成 ※キーは内部コード(utf8)
+#	トリップ生成 ※キーは内部コードまたはバイト列
 #
 #-------------------------------------------------------------------------------
 sub trip {
@@ -163,111 +163,7 @@ sub trip {
 	my $key2 = undef;
 	my $type = 'unknown';
 	
-	my $_key = $key;
-	
-	# 事前置換処理
-	if ($mode eq 'next' || $mode eq 'bban' || $mode eq 'ebbs' ||
-	    $mode eq 'atchs') {
-		$_key =~ s/\s+$//;
-	} elsif ($mode eq 'strb' || $mode eq 'machi') {
-		$_key =~ s/ +$//;
-	}
-	if ($mode eq 'net') {
-		$_key =~ s/＃/#/g;
-	} elsif ($mode eq 'open') {
-		$_key =~ s/\t//g;
-		$_key =~ s/</&lt;/g;
-		$_key =~ s/>/&gt;/g;
-		$_key =~ s/"/&quot;/g;
-		$_key =~ s/'/&#39;/g;
-		$_key =~ tr/■▲▼★●◆/□△▽☆○◇/;
-	} elsif ($mode eq 'next') {
-		$_key =~ s/&/&amp;/g;
-		$_key =~ s/</&lt;/g;
-		$_key =~ s/>/&gt;/g;
-		$_key =~ s/"/&quot;/g;
-		$_key =~ s/'/&#039;/g;
-		$_key =~ tr/★◆/☆◇/;
-	} elsif ($mode eq 'strb') {
-		$_key =~ s/\t/ /g;
-		$_key =~ s/</&lt;/g;
-		$_key =~ s/>/&gt;/g;
-		$_key =~ s/"/&quot;/g;
-		$_key =~ s/◆/◇/g;
-		$_key =~ s/＃/#/g;
-	} elsif ($mode eq 'vips') {
-		$_key =~ s/</&lt;/g;
-		$_key =~ s/>/&gt;/g;
-		$_key =~ s/"/&quot;/g;
-		$_key =~ s/'/&#39;/g;
-	} elsif ($mode eq '0chp') {
-		$_key =~ s/＃/#/;		# 1回のみ(名前全体)
-	} elsif ($mode eq 'machi') {
-		$_key =~ s/&/&amp/g;	# セミコロンなし
-		$_key =~ s/</&lt;/g;
-		$_key =~ s/>/&gt;/g;
-		$_key =~ s/"/&quot;/g;
-	} elsif ($mode eq 'patio') {
-		$_key =~ s/&/&amp;/g;
-		$_key =~ s/</&lt;/g;
-		$_key =~ s/>/&gt;/g;
-		$_key =~ s/"/&quot;/g;
-		$_key =~ s/'/&#39;/g;
-	} elsif ($mode eq '4chan') {
-		$_key =~ s/&/&amp;/g;
-		$_key =~ s/</&lt;/g;
-		$_key =~ s/>/&gt;/g;
-		$_key =~ s/"/&amp;quot;/g;
-	} elsif ($mode eq 'ebbs') {
-		$_key =~ s/&/&amp;/g;
-		$_key =~ s/</&amp;lt;/g;
-		$_key =~ s/>/&amp;gt;/g;
-		$_key =~ s/"/&quot;/g;
-		$_key =~ s/'/&#039;/g;
-	} elsif ($mode eq 'atchs') {
-		$_key =~ s/&/&amp;/g;
-		$_key =~ s/</&lt;/g;
-		$_key =~ s/>/&gt;/g;
-		$_key =~ s/"/&quot;/g;
-		$_key =~ s/'/&#039;/g;
-		$_key =~ tr/★◆/☆◇/;
-	}
-	
-	# 文字コード関連
-	if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'strb' || 
-	    $mode eq 'vips' || $mode eq '0chp' || $mode eq 'bban' ||
-	    $mode eq 'machi' || $mode eq 'patio' || $mode eq '4chan' ||
-	    $mode eq 'ebbs') {
-		$_key = encode('cp932', $_key);
-	} elsif ($mode eq 'open') {
-		$_key = encode('sjis', $_key);
-	} elsif ($mode eq 'next') {
-		$_key = encode('utf8', $_key);
-	} elsif ($mode eq 'atchs') {
-		my $valid = 1;
-		my $str = encode('utf8', $_key);
-		$str = decode('eucjp', $str, sub { $valid = 0; '' });
-		$str = encode('sjis', $str, sub { $valid = 0; '' });
-		if ($valid) {
-			$_key = $str;
-		} else {
-			$_key =~ s/\x{ff5e}/\x{301c}/g;	# 波ダッシュ
-			$_key =~ s/\x{ff0d}/\x{2212}/g;	# 全角ダッシュ
-			$_key = encode('sjis', $_key);
-		}
-	} else {
-		$_key = encode('cp932', $_key);
-	}
-	
-	# 事前置換処理
-	if ($mode eq 'sc') {
-		$_key =~ s/\x81\x94/ #/;		# s/＃/ #/ 1回のみ(名前全体)
-	} elsif ($mode eq 'machi') {
-		$_key =~ s/\x81\x9f/\x81\x9e/g;	# s/◆/◇/g
-		$_key =~ s/\x81\x94/#/g;		# s/＃/#/g
-	} elsif ($mode eq 'patio') {
-		$_key =~ s/\x81\x9f/\x81\x9e/g;	# s/◆/◇/g
-	}
+	my $_key = str2key($key, $mode);
 	
 	# 空キー不可
 	if (length($_key) == 0 &&
@@ -334,21 +230,22 @@ sub trip {
 		if ($mode eq 'net' || $mode eq 'sc' || $mode eq 'open' || 
 		    $mode eq 'vips' || $mode eq '0chp' || $mode eq 'bban') {
 			$key2 = substr($_key, 0, 8);
-			$key2 =~ s/([\x00-\xff])/unpack('H2', $1)/eg;
+			$key2 =~ s/(.)/unpack('H2', $1)/ego;
 			$key2 .= '0' x (16 - length($key2));
 			$key2 = "#$key2$salt";
 		}
 		
+		$_key =~ s/\x00.*$//so;
 		# 0x80問題再現
 		if ($mode eq 'net' || $mode eq '0chp') {
-			$_key =~ s/\x80[\x00-\xff]*$//;
+			$_key =~ s/\x80.*$//so;
 		}
 		
 		# 10桁トリップ生成
 		$trip = substr(crypt($_key, $salt), -10);
 		
 	# キー長が12bytes以上で生キー形式なら10桁トリップ
-	} elsif ($_key =~ /^#([0-9a-zA-Z]{16})([\.\/0-9A-Za-z]{0,2})$/ ) {
+	} elsif ($_key =~ /^#([0-9a-zA-Z]{16})([\.\/0-9A-Za-z]{0,2})$/so ) {
 		
 		$type = '10nama';
 		
@@ -367,16 +264,17 @@ sub trip {
 		# 文字コード関連
 		$key1 = decode('cp932', $key1) if (defined $key1);
 		
+		$_key =~ s/\x00.*$//so;
 		# 0x80問題再現
 		if ($mode eq 'net' || $mode eq '0chp') {
-			$_key =~ s/\x80[\x00-\xff]*$//;
+			$_key =~ s/\x80.*$//so;
 		}
 		
 		# 10桁トリップ生成
 		$trip = substr(crypt($_key, $salt), -10);
 		
 	# キー長が12bytes以上で先頭が$なら独自拡張/未定義
-	} elsif ($_key =~ /^\$/) {
+	} elsif ($_key =~ /^\$/so) {
 		
 		$key1 = $key;
 		
@@ -389,7 +287,7 @@ sub trip {
 			$trip =~ tr/\/+/!./;
 			
 			# 2バイト目が半角カタカナならカタカナトリップ
-			if ($_key =~ /^\$[\xa1-\xdf]/) { # [｡-ﾟ]
+			if ($_key =~ /^\$[\xa1-\xdf]/so) { # [｡-ﾟ]
 				$type = '15kana';
 				$trip =~ tr/0-9A-Za-z.!/\xa1-\xdf!/;
 				$trip = decode('cp932', $trip) if (defined $key1);
@@ -400,7 +298,7 @@ sub trip {
 		}
 		
 	# キー長が12bytes以上で先頭が#なら未定義
-	} elsif ($key =~ /^#/) {
+	} elsif ($key =~ /^#/so) {
 		
 		$key1 = $key;
 		
@@ -419,7 +317,7 @@ sub trip {
 		
 	}
 	
-	return ($trip, $key1, $key2, $key, $type);
+	return ($trip, $key1, $key2, $key, $type, $_key);
 }
 
 #-------------------------------------------------------------------------------
@@ -430,7 +328,7 @@ sub trip {
 sub key2sjis {
 	my ($key, $salt) = @_;
 	
-	$key =~ s/\x00+$//;
+	$key =~ s/\x00+$//so;
 	
 	my $salt2 = (length($key) > 1 ? substr($key, 1) : '');
 	$salt2 = substr("${salt2}H.", 0, 2);
@@ -438,7 +336,7 @@ sub key2sjis {
 	$salt2 =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
 	
 	if ($salt2 eq $salt) {
-		if ($key =~ /^(?:[\x20-\x7e\xa1-\xdf]|[\x81-\x9f\xe0-\xfc][\x40-\x7e\x80-\xfc])+([\x81-\x9f\xe0-\xfc]?)$/) {
+		if ($key =~ /^(?:[\x20-\x7e\xa1-\xdf]|[\x81-\x9f\xe0-\xfc][\x40-\x7e\x80-\xfc])*([\x81-\x9f\xe0-\xfc]?)$/so) {
 			if ($1 eq '') {
 				return $key;
 			} elsif (length($key) == 8) {
@@ -449,6 +347,126 @@ sub key2sjis {
 	}
 	
 	return undef;
+}
+
+#-------------------------------------------------------------------------------
+#
+#	キーの事前処理
+#
+#-------------------------------------------------------------------------------
+sub str2key {
+	my ($key, $mode) = @_;
+	
+	# 事前置換処理
+	if ($mode eq 'next' || $mode eq 'bban' || $mode eq 'ebbs' ||
+	    $mode eq 'atchs') {
+		$key =~ s/\s+$//so;
+	} elsif ($mode eq 'strb' || $mode eq 'machi') {
+		$key =~ s/ +$//so;
+	}
+	if ($mode eq 'net') {
+		$key =~ s/＃/#/go;
+	} elsif ($mode eq 'open') {
+		$key =~ s/\t//go;
+		$key =~ s/</&lt;/go;
+		$key =~ s/>/&gt;/go;
+		$key =~ s/"/&quot;/go;
+		$key =~ s/'/&#39;/go;
+		$key =~ tr/■▲▼★●◆/□△▽☆○◇/;
+	} elsif ($mode eq 'next') {
+		$key =~ s/&/&amp;/go;
+		$key =~ s/</&lt;/go;
+		$key =~ s/>/&gt;/go;
+		$key =~ s/"/&quot;/go;
+		$key =~ s/'/&#039;/go;
+		$key =~ tr/★◆/☆◇/;
+	} elsif ($mode eq 'strb') {
+		$key =~ s/\t/ /go;
+		$key =~ s/</&lt;/go;
+		$key =~ s/>/&gt;/go;
+		$key =~ s/"/&quot;/go;
+		$key =~ s/◆/◇/go;
+		$key =~ s/＃/#/go;
+	} elsif ($mode eq 'vips') {
+		$key =~ s/</&lt;/go;
+		$key =~ s/>/&gt;/go;
+		$key =~ s/"/&quot;/go;
+		$key =~ s/'/&#39;/go;
+	} elsif ($mode eq '0chp') {
+		$key =~ s/＃/#/o;		# 1回のみ(名前全体)
+	} elsif ($mode eq 'machi') {
+		$key =~ s/&/&amp/go;	# セミコロンなし
+		$key =~ s/</&lt;/go;
+		$key =~ s/>/&gt;/go;
+		$key =~ s/"/&quot;/go;
+	} elsif ($mode eq 'patio') {
+		$key =~ s/&/&amp;/go;
+		$key =~ s/</&lt;/go;
+		$key =~ s/>/&gt;/go;
+		$key =~ s/"/&quot;/go;
+		$key =~ s/'/&#39;/go;
+	} elsif ($mode eq '4chan') {
+		$key =~ s/&/&amp;/go;
+		$key =~ s/</&lt;/go;
+		$key =~ s/>/&gt;/go;
+		$key =~ s/"/&amp;quot;/go;
+	} elsif ($mode eq 'ebbs') {
+		$key =~ s/&/&amp;/go;
+		$key =~ s/</&amp;lt;/go;
+		$key =~ s/>/&amp;gt;/go;
+		$key =~ s/"/&quot;/go;
+		$key =~ s/'/&#039;/go;
+	} elsif ($mode eq 'atchs') {
+		$key =~ s/&/&amp;/go;
+		$key =~ s/</&lt;/go;
+		$key =~ s/>/&gt;/go;
+		$key =~ s/"/&quot;/go;
+		$key =~ s/'/&#039;/go;
+		$key =~ tr/★◆/☆◇/;
+	}
+	
+	# 文字コード関連
+	if (!utf8::is_utf8($key)) {
+		
+	} elsif ($mode eq 'net' || $mode eq 'sc' || $mode eq 'strb' || 
+	         $mode eq 'vips' || $mode eq '0chp' || $mode eq 'bban' ||
+	         $mode eq 'machi' || $mode eq 'patio' || $mode eq '4chan' ||
+	         $mode eq 'ebbs') {
+		$key = encode('cp932', $key);
+	} elsif ($mode eq 'open') {
+		$key = encode('sjis', $key);
+	} elsif ($mode eq 'next') {
+		$key = encode('utf8', $key);
+	} elsif ($mode eq 'atchs') {
+		my $utf8 = encode('utf8', $key);
+		my $utf8sjis = 0;
+		my $sjissjis = 0;
+		my $eucjpsjis = 0;
+		my $key_utf8sjis = encode('sjis', $key, sub { $utf8sjis++; '?' });
+		my $key_sjissjis = decode('sjis', $utf8, sub { $sjissjis++; '?' });
+		my $key_eucjpsjis = decode('eucjp', $utf8, sub { $eucjpsjis++; '?' });
+		if ($utf8sjis <= $sjissjis && $utf8sjis <= $eucjpsjis) {
+			$key = $key_utf8sjis;
+		} elsif ($sjissjis <= $utf8sjis && $sjissjis <= $eucjpsjis) {
+			$key = encode('sjis', $key_sjissjis);
+		} elsif ($eucjpsjis <= $utf8sjis && $eucjpsjis <= $sjissjis) {
+			$key = encode('sjis', $key_eucjpsjis);
+		}
+	} else {
+		$key = encode('cp932', $key);
+	}
+	
+	# 事前置換処理
+	if ($mode eq 'sc') {
+		$key =~ s/\x81\x94/ #/o;		# s/＃/ #/ 1回のみ(名前全体)
+	} elsif ($mode eq 'machi') {
+		$key =~ s/\x81\x9f/\x81\x9e/go;	# s/◆/◇/g
+		$key =~ s/\x81\x94/#/go;		# s/＃/#/g
+	} elsif ($mode eq 'patio') {
+		$key =~ s/\x81\x9f/\x81\x9e/go;	# s/◆/◇/g
+	}
+	
+	return $key;
 }
 
 exit(main()) if (!defined caller);
